@@ -5,7 +5,7 @@
 2. |      Name     |   Student ID  | Github username |
    | ------------  | ------------- | ------------- |
    | Noah Gibson  | 23339303  | noahgibson710  | 
-   |   |   |   |
+   | Tahjeeb Tajwar  | 23738292  |  tajwar0011 |
    |   |   |   | 
    |   |   |   |
 
