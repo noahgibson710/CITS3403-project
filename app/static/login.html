@@ -7,12 +7,14 @@
 </head>
 <body>
   <h2>Login</h2>
-  <form method="POST" action="/login">
+  <form>
     <label>Username:</label><br />
     <input type="text" name="username" required><br />
     <label>Password:</label><br />
     <input type="password" name="password" required><br /><br />
-    <input type="submit" value="Login">
+    <input type="submit" value="Login" id="loginForm">
   </form>
+  <p id="message"></p>
+  <script src="login.js"></script>
 </body>
 </html>
