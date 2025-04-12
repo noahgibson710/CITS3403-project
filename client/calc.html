@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculator Form</title>
+    <script>
+        function calculate(event) {
+            event.preventDefault(); // Prevent form submission
+            const age = document.getElementById('box1').value;
+            const weight = document.getElementById('box2').value;
+            const height = document.getElementById('box3').value;
+
+            const resultDiv = document.getElementById('result');
+            resultDiv.textContent = `Age: ${age}, Weight: ${weight} kg, Height: ${height} cm`;
+        }
+    </script>
+</head>
+<body>
+    <h1>Calculator Form</h1>
+    <form onsubmit="calculate(event)">
+        <label for="box1">Age:</label>
+        <input type="text" id="box1" placeholder=""><br><br>
+
+        <label for="box2">Weight:</label>
+        <input type="text" id="box2" placeholder="weight in kilograms"><br><br>
+
+        <label for="box3">Height:</label>
+        <input type="text" id="box3" placeholder="height in cm"><br><br>
+
+        <button type="submit">Calculate</button>
+    </form>
+    <div id="result" style="margin-top: 20px; font-weight: bold;"></div>
+</body>
+</html>
