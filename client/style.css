@@ -1,56 +1,80 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <title>Health Macro Calculator - Home</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+/* Basic reset and styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 
-  <!-- Link to external CSS -->
-  <link rel="stylesheet" href="style.css" />
-</head>
-<body>
+body {
+  font-family: Arial, sans-serif;
+  line-height: 1.6;
+}
 
-  <!-- Header + Nav -->
-  <header>
-    <nav>
-      <ul>
-        <li><a href="login.html">Login</a></li>
-        <li><a href="calc.html">Macro Calc</a></li>
-        <li><a href="results.html">Results</a></li>
-        <li><a href="profile.html">Profile</a></li>
-      </ul>
-    </nav>
-  </header>
+header {
+  background-color: #f1f1f1;
+  padding: 1rem;
+}
 
-  <!-- Hero or Main Landing Section -->
-  <div class="hero">
-    <h1>Welcome to the Health Macro Calculator</h1>
-    <p>
-      Track your nutrition, monitor your progress, and reach your health goals.
-      Our tool calculates recommended macros based on your personal information
-      and fitness objectives.
-    </p>
-    <div class="cta">
-      <a href="login.html">Login</a>
-      <a href="signup.html">Sign Up</a>
-    </div>
-  </div>
+nav ul {
+  display: flex;
+  list-style: none;
+  justify-content: flex-end;
+}
 
-  <!-- Main Content Section -->
-  <section>
-    <h2>Why Use Our Macro Calculator?</h2>
-    <p>
-      Our calculator provides precise estimates of your daily macronutrient
-      requirements (protein, carbohydrates, and fats) to help you reach your
-      fitness goals. Whether you're trying to lose weight, build muscle, or
-      maintain a healthy lifestyle, understanding your macros is key.
-    </p>
-  </section>
+nav li {
+  margin-left: 1rem;
+}
 
-  <!-- Footer -->
-  <footer>
-    <p>&copy; 2025 Health Macro Calculator. All Rights Reserved.</p>
-  </footer>
+nav a {
+  text-decoration: none;
+  color: #333;
+  font-weight: bold;
+}
 
-</body>
-</html>
+nav a:hover {
+  text-decoration: underline;
+}
+
+.hero {
+  text-align: center;
+  padding: 3rem 1rem;
+  background-color: #fafafa;
+}
+
+.hero h1 {
+  margin-bottom: 0.5rem;
+}
+
+.hero p {
+  max-width: 600px;
+  margin: 0.5rem auto 1rem;
+}
+
+.cta {
+  margin: 1rem 0;
+}
+
+.cta a {
+  text-decoration: none;
+  background: #333;
+  color: #fff;
+  padding: 0.75rem 1.25rem;
+  border-radius: 4px;
+  margin: 0.5rem;
+  display: inline-block;
+}
+
+/* Page sections */
+section {
+  padding: 2rem 1rem;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+/* Footer */
+footer {
+  background-color: #f1f1f1;
+  text-align: center;
+  padding: 1rem;
+  margin-top: 2rem;
+}
