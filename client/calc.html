@@ -7,9 +7,9 @@
     <script>
         function calculate(event) {
             event.preventDefault(); // Prevent form submission
-            const age = document.getElementById('box1').value;
-            const weight = document.getElementById('box2').value;
-            const height = document.getElementById('box3').value;
+            const age = document.getElementById('age').value;
+            const weight = document.getElementById('weight').value;
+            const height = document.getElementById('height').value;
 
             const resultDiv = document.getElementById('result');
             resultDiv.textContent = `Age: ${age}, Weight: ${weight} kg, Height: ${height} cm`;
@@ -19,14 +19,14 @@
 <body>
     <h1>Calculator Form</h1>
     <form onsubmit="calculate(event)">
-        <label for="box1">Age:</label>
-        <input type="text" id="box1" placeholder=""><br><br>
+        <label for="age">Age (21-70):</label><br>
+        <input type="number" id="age" name="age" min="21" max="70" required><br><br>
 
-        <label for="box2">Weight:</label>
-        <input type="text" id="box2" placeholder="weight in kilograms"><br><br>
+        <label for="weight">Weight (25.0-124.9kg):</label><br>
+        <input type="number" id="weight" min="25.0" max="124.9" placeholder="weight in kilograms"><br><br>
 
-        <label for="box3">Height:</label>
-        <input type="text" id="box3" placeholder="height in cm"><br><br>
+        <label for="height">Height:</label><br>
+        <input type="number" id="height" min="151" max="200" placeholder="height in cm"><br><br>
 
         <button type="submit">Calculate</button>
     </form>
