@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Health Macro Calculator - Home</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Link to external CSS -->
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- Header + Nav -->
+  <header>
+    <nav>
+      <ul>
+        <li><a href="login.html">Login</a></li>
+        <li><a href="calc.html">Macro Calc</a></li>
+        <li><a href="results.html">Results</a></li>
+        <li><a href="profile.html">Profile</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- Hero or Main Landing Section -->
+  <div class="hero">
+    <h1>Welcome to the Health Macro Calculator</h1>
+    <p>
+      Track your nutrition, monitor your progress, and reach your health goals.
+      Our tool calculates recommended macros based on your personal information
+      and fitness objectives.
+    </p>
+    <div class="cta">
+      <a href="login.html">Login</a>
+      <a href="signup.html">Sign Up</a>
+    </div>
+  </div>
+
+  <!-- Main Content Section -->
+  <section>
+    <h2>Why Use Our Macro Calculator?</h2>
+    <p>
+      Our calculator provides precise estimates of your daily macronutrient
+      requirements (protein, carbohydrates, and fats) to help you reach your
+      fitness goals. Whether you're trying to lose weight, build muscle, or
+      maintain a healthy lifestyle, understanding your macros is key.
+    </p>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <p>&copy; 2025 Health Macro Calculator. All Rights Reserved.</p>
+  </footer>
+
+</body>
+</html>
