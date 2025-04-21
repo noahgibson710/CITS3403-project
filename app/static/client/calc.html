@@ -37,6 +37,9 @@
         <strong>TDEE: ${tdee.toFixed(2)} calories/day</strong>
       `;
     }
+    window.onload = function () {
+      document.querySelector("form").onsubmit = calculate;
+  };
   </script>
 </head>
 <body>
