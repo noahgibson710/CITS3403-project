@@ -177,3 +177,48 @@ section p {
   line-height: 1.6;
 }
 
+/* Signup/ login link */
+.signup-link {
+  text-align: center;
+  margin-top: 1rem;
+  font-size: 1rem;
+  color: #ddd;
+}
+
+.signup-link a {
+  color: #ff6b6b;
+  font-weight: bold;
+  text-decoration: none;
+  position: relative;
+  transition: color 0.3s ease;
+}
+
+.signup-link a::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  height: 2px;
+  width: 0%;
+  background-color: #ff6b6b;
+  transition: width 0.3s ease;
+}
+
+.signup-link a:hover {
+  color: #fff;
+}
+
+.signup-link a:hover::after {
+  width: 100%;
+}
+
+.profile-picture {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #ff6b6b;
+  display: block;
+  margin: 1rem auto;
+  box-shadow: 0 0 10px rgba(255, 107, 107, 0.3);
+}
