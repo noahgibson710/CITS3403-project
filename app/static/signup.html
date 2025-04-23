@@ -21,7 +21,7 @@
       </header>
     <div class="signup-container">
         <h1>Signup</h1>
-        <form action="/signup" method="POST">
+        <form id="signupform" action="/signup" method="POST">
             <label for="name">Name:</label>
             <input type="text" id="name" name="name" required>
             
@@ -35,8 +35,9 @@
         </form>
     </div>
 
-    <p id="message"></p>
+    <p id="signup-message"></p>
     <p class="signup-link">Already have an account? <a href="login.html">Login</a></p>
 
+    <script src="signup.js"></script>
 </body>
 </html>
