@@ -55,6 +55,15 @@ def logout():
     session.pop("user", None)
     return redirect("/")
 
+# Handle the POST request
+@app.route('/signup', methods=['POST'])
+def signup():
+    name = request.form.get('name')
+    email = request.form.get('email')
+    password = request.form.get('password')
+    print(f"Received: {name}, {email}, {password}")   
+    return jsonify({'message': 'Signup successful!'}), 200
+
 # Static file serving (CSS, JS, etc.)
 @app.route("/<path:filename>")
 def static_files(filename):

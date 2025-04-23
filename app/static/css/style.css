@@ -222,3 +222,19 @@ section p {
   margin: 1rem auto;
   box-shadow: 0 0 10px rgba(255, 107, 107, 0.3);
 }
+
+#signup-message {
+  text-align: center;
+  font-weight: bold;
+  padding: 10px;
+  border-radius: 5px;
+  margin-bottom: 15px;
+}
+#signup-message.success {
+  color: #155724;
+  background-color: #d4edda;
+}
+#signup-message.error {
+  color: #721c24;
+  background-color: #f8d7da;
+}
