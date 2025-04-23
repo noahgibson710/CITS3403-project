@@ -74,19 +74,15 @@ def static_files(filename):
 def favicon():
     return "", 204
 
+# favicon
+@app.route('/favicon.ico')
+def web_favicon():
+    return send_from_directory(
+        os.path.join(app.root_path, 'static', 'images'),
+        'web_favicon',
+        mimetype='image/png'
+    )
 
-#for results rendering test
-@app.route("/api/results", methods=["GET"])
-def api_results():
-    # Simulate some data
-    results = {
-        "data": [
-            {"id": 1, "name": "Result 1"},
-            {"id": 2, "name": "Result 2"},
-            {"id": 3, "name": "Result 3"},
-        ]
-    }
-    return jsonify(results)
 # Run the server
 if __name__ == "__main__":
     app.run(debug=True)
