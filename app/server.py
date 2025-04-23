@@ -58,7 +58,7 @@ def logout():
 # Handle the POST request
 @app.route('/signup', methods=['POST'])
 def signup():
-    name = request.form.get('name')
+    username = request.form.get('name')
     email = request.form.get('email')
     password = request.form.get('password')
     print(f"Received: {name}, {email}, {password}")   
