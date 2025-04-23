@@ -20,7 +20,12 @@ document.getElementById('signupform').addEventListener('submit', function (e) {
             document.getElementById("signup-message").textContent = "✅ Signup Successful!";
             signupmessage.className = "success";
         } else {
-            document.getElementById("signup-message").textContent = "❌ Signup Failed!";
+            try {
+                const response = JSON.parse(xhttp.responseText);
+                signupmessage.textContent = "❌ " + (response["signup-message"] || "Signup Failed!");
+            } catch (e) {
+                document.getElementById("signup-message").textContent = "❌ Signup Failed!";
+            }
             signupmessage.className = "error";
         }
     };

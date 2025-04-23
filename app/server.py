@@ -9,7 +9,8 @@ CORS(app)  # Allow frontend JS to access API
 app.secret_key = "supersecretkey"
 
 # DB setup
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
+db_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'instance', 'users.db'))
+app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)
 
@@ -17,7 +18,7 @@ db.init_app(app)
 with app.app_context():
     db.create_all()
     if not User.query.filter_by(username='admin').first():
-        db.session.add(User(username='admin', password='1234'))
+        db.session.add(User(username='admin', email ='admin@example.com', password='1234'))
         db.session.commit()
 
 # === ROUTES ===
@@ -61,7 +62,21 @@ def signup():
     username = request.form.get('name')
     email = request.form.get('email')
     password = request.form.get('password')
-    print(f"Received: {name}, {email}, {password}")   
+
+    print(f"Received: {username}, {email}, {password}")   #debugging, showing on console
+
+    existing = User.query.filter(User.username == username).first()  #Return an error signup-message if user exists
+    if existing:
+        return jsonify({"signup-message": "User already exists. Please log in instead"}), 400
+
+    try:
+        user = User(username=username, email=email, password=password)   #Save to database
+        db.session.add(user)
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"signup-message": "User already exists. Please log in instead"}), 400
+
     return jsonify({'message': 'Signup successful!'}), 200
 
 # Static file serving (CSS, JS, etc.)
