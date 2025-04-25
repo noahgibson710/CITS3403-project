@@ -12,9 +12,18 @@ document.getElementById('signupform').addEventListener('submit', function (e) {
     xhttp.send(parameters);
 
     xhttp.onload = function () {
+        const password = document.getElementById('password').value;
+        const message = document.getElementById("signup-message");
+        const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\W).{8,}$/; // A password needs to have at least: one lowercase + one uppercase + one special character + 8 characters long
         const signupmessage = document.getElementById("signup-message");
         signupmessage.textContent = "";  
         signupmessage.removeAttribute("class");
+
+        if (!passwordPattern.test(password)) {       //Password validation
+            message.textContent = "❌ Password must be at least 8 characters long and include uppercase, lowercase, and a special character.";
+            message.className = "error";
+            return;
+        }
 
         if (xhttp.status == 200) {
             document.getElementById("signup-message").textContent = "✅ Signup Successful!";
@@ -39,3 +48,9 @@ document.querySelectorAll("#signupform input").forEach(input => {
       message.removeAttribute("class");
     });
   });
+
+  // Users can make their passwords visible when signing up so that they can check whether the password meets the requirement 
+document.getElementById('show-password-checkbox').addEventListener('change', function () {
+    const passwordField = document.getElementById('password');
+    passwordField.type = this.checked ? 'text' : 'password';
+});
