@@ -1,6 +1,7 @@
 from flask import Flask, request, session, redirect, send_from_directory, jsonify
 from flask_cors import CORS
 from models import db, User
+import re
 import os
 
 app = Flask(__name__)
@@ -65,10 +66,16 @@ def signup():
 
     print(f"Received: {username}, {email}, {password}")   #debugging, showing on console
 
-    existing = User.query.filter(User.username == username).first()  #Return an error signup-message if user exists
+    if not re.match(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\W).{8,}$', password): #Return an error if the signup password does not meet the requirement
+        return jsonify({"signup-message": "Password must be at least 8 characters and include uppercase, lowercase, and special character."}), 400
+
+    existing = User.query.filter(User.username == username).first()  #Return an error signup-message if user name exists 
     if existing:
         return jsonify({"signup-message": "User already exists. Please log in instead"}), 400
 
+    if User.query.filter_by(email=email).first():  #Return an error signup-message if email is already used
+        return jsonify({"signup-message": "Email is already registered. Please use a different email."}), 400
+    
     try:
         user = User(username=username, email=email, password=password)   #Save to database
         db.session.add(user)
