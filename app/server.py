@@ -18,7 +18,7 @@ db.init_app(app)
 with app.app_context():
     db.create_all()
     if not User.query.filter_by(username='admin').first():
-        db.session.add(User(username='admin', email ='admin@example.com', password='1234'))
+        db.session.add(User(username='admin', email ='admin@example.com', password='12345678'))
         db.session.commit()
 
 # === ROUTES ===
