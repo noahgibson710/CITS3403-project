@@ -1,18 +1,18 @@
 from flask import Blueprint, render_template
 from flask import Flask, request, session, redirect, send_from_directory, jsonify
+from app import app
+# app = Blueprint("app", __name__)
+# from app.models import User  # Assuming you have a User model defined in models.py
 
-main = Blueprint("main", __name__)
-# from main.models import User  # Assuming you have a User model defined in models.py
-
-@main.route("/")
+@app.route("/")
 def home():
     return render_template("home.html")
 
-@main.route("/login")
+@app.route("/login")
 def login_page():
     return render_template("login.html")
 
-@main.route("/api/login", methods=["POST"])
+@app.route("/api/login", methods=["POST"])
 def api_login():
     data = request.get_json()
     print("[DEBUG] Received login data:", data)
@@ -26,37 +26,65 @@ def api_login():
         return jsonify({"success": True, "username": username})
     return jsonify({"success": False}), 401
 
-@main.route("/dashboard")
+@app.route("/dashboard")
 def dashboard():
     if "user" in session:
         return f"<h2>Welcome {session['user']}!</h2><br><a href='/logout'>Logout</a>"
     return redirect("/login")
 
-@main.route("/logout")
+@app.route("/logout")
 def logout():
     session.pop("user", None)
     return redirect("/")
 
+# Handle the POST request
+@app.route('/signup', methods=['POST'])
+def signup():
+    username = request.form.get('name')
+    email = request.form.get('email')
+    password = request.form.get('password')
+
+    print(f"Received: {username}, {email}, {password}")   #debugging, showing on console
+
+    if not re.match(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\W).{8,}$', password): #Return an error if the signup password does not meet the requirement
+        return jsonify({"signup-message": "Password must be at least 8 characters and include uppercase, lowercase, and special character."}), 400
+
+    existing = User.query.filter(User.username == username).first()  #Return an error signup-message if user name exists 
+    if existing:
+        return jsonify({"signup-message": "User already exists. Please log in instead"}), 400
+
+    if User.query.filter_by(email=email).first():  #Return an error signup-message if email is already used
+        return jsonify({"signup-message": "Email is already registered. Please use a different email."}), 400
+    
+    try:
+        user = User(username=username, email=email, password=password)   #Save to database
+        db.session.add(user)
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"signup-message": "User already exists. Please log in instead"}), 400
+
+    return jsonify({'message': 'Signup successful!'}), 200
+
 # Static file serving (CSS, JS, etc.)
-@main.route("/<path:filename>")
+@app.route("/<path:filename>")
 def static_files(filename):
     return send_from_directory("static", filename)
 
 # Optional: Suppress favicon error
-@main.route("/favicon.ico")
+@app.route("/favicon.ico")
 def favicon():
     return "", 204
 
+# favicon
+@app.route('/favicon.ico')
+def web_favicon():
+    return send_from_directory(
+        os.path.join(app.root_path, 'static', 'images'),
+        'web_favicon',
+        mimetype='image/png'
+    )
 
-#for results rendering test
-@main.route("/api/results", methods=["GET"])
-def api_results():
-    # Simulate some data
-    results = {
-        "data": [
-            {"id": 1, "name": "Result 1"},
-            {"id": 2, "name": "Result 2"},
-            {"id": 3, "name": "Result 3"},
-        ]
-    }
-    return jsonify(results)
+# Run the server
+if __name__ == "__app__":
+    app.run(debug=True)

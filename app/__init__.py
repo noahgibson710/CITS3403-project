@@ -1,9 +1,5 @@
 from flask import Flask
 
-def create_app():
-    app = Flask(__name__)
+app = Flask(__name__, instance_relative_config=True)
 
-    from app.routes import main  # import the Blueprint
-    app.register_blueprint(main) # register it
-
-    return app
+from app import routes
