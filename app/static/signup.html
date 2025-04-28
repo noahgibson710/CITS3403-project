@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Signup</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="/static/images/web_favicon.png" type="image/png">
 </head>
 <body>
     <header>
@@ -21,7 +22,7 @@
       </header>
     <div class="signup-container">
         <h1>Signup</h1>
-        <form action="/signup" method="POST">
+        <form id="signupform" action="/signup" method="POST">
             <label for="name">Name:</label>
             <input type="text" id="name" name="name" required>
             
@@ -30,13 +31,19 @@
             
             <label for="password">Password:</label>
             <input type="password" id="password" name="password" required>
-            
+
+            <div id="show-password-label-checkbox">
+              <input type="checkbox" id="show-password-checkbox">
+              <label for="show-password-checkbox" id="show-password-label">Show Password</label>
+            </div>
+
             <button type="submit">Sign Up</button>
         </form>
     </div>
 
-    <p id="message"></p>
+    <p id="signup-message"></p>
     <p class="signup-link">Already have an account? <a href="login.html">Login</a></p>
 
+    <script src="signup.js"></script>
 </body>
 </html>
