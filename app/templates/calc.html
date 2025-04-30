@@ -1,80 +1,12 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <link rel="stylesheet" href="style.css" />
-  <link rel="icon" href="/static/images/web_favicon.png" type="image/png">
+{% extends "base.html" %}
+{% block title %}Calc{% endblock %}
+
+{% block content %}
   <title>Calculator Form</title>
 
-  <script>
-    function calculate(event) {
-      event.preventDefault(); // Prevent form submission
 
-      const age = parseFloat(document.getElementById('age').value);
-      const weight = parseFloat(document.getElementById('weight').value);
-      const height = parseFloat(document.getElementById('height').value);
-      const gender = document.getElementById('gender').value;
-      const activityFactor = parseFloat(document.getElementById('activity').value);
-
-      let bmr;
-
-      if (gender === "male") {
-        bmr = (13.397 * weight) + (4.799 * height) - (5.677 * age) + 88.362;
-      } else if (gender === "female") {
-        bmr = (9.247 * weight) + (3.098 * height) - (4.330 * age) + 447.593;
-      }
-
-      const tdee = bmr * activityFactor;
-
-      // Save results to localStorage
-      const resultsData = {
-        gender,
-        age,
-        weight,
-        height,
-        bmr: bmr.toFixed(2),
-        tdee: tdee.toFixed(2)
-      };
-      localStorage.setItem("calcResults", JSON.stringify(resultsData));
-
-      // Optional: Show results on this page
-      const resultDiv = document.getElementById('result');
-      resultDiv.innerHTML = `
-        Gender: ${gender.charAt(0).toUpperCase() + gender.slice(1)}<br>
-        Age: ${age} <br>
-        Weight: ${weight} kg <br>
-        Height: ${height} cm <br>
-        <strong>BMR: ${bmr.toFixed(2)} calories/day</strong><br>
-        <strong>TDEE: ${tdee.toFixed(2)} calories/day</strong><br><br>
-        Redirecting to Results page...
-      `;
-
-      // Redirect after short delay
-      setTimeout(() => {
-        window.location.href = "results.html";
-      }, 1500);
-    }
-
-    window.onload = function () {
-      document.querySelector("form").onsubmit = calculate;
-    };
-  </script>
-</head>
 <body>
-
-<header>
-  <nav>
-    <ul>
-      <li><a href="login.html">Login</a></li>
-      <li><a href="calc.html">Macro Calc</a></li>
-      <li><a href="results.html">Results</a></li>
-      <li><a href="profile.html">Profile</a></li>
-      <li><a href="about.html">About Us</a></li>
-      <li><a href="home.html">Home</a></li>
-    </ul>
-  </nav>
-</header>
+<script src="./static/js/calc.js"></script>
 
 <h1>Calculator Form</h1>
 <form onsubmit="calculate(event)">
@@ -94,7 +26,7 @@
   <label for="height">Height (151–200 cm):</label><br>
   <input type="number" id="height" min="151" max="200" placeholder="Height in cm" required><br><br>
 
-  <label for="activity">Activity Level:</label><br>
+  <label for="activity">Activity Level:</label><br> 
   <select id="activity" name="activity" required>
     <option value="" disabled selected>Select activity level</option>
     <option value="1.2">Sedentary (little or no exercise)</option>
@@ -109,4 +41,5 @@
 
 <div id="result" style="margin-top: 20px; font-weight: bold;"></div>
 </body>
-</html>
+
+{% endblock %}

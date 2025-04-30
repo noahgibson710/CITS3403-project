@@ -1,22 +1,24 @@
 {% extends "base.html" %}
-{% block title %}Sign Up{% endblock %}
+{% block title %}Signup{% endblock %}
 {% block content %}
+
 <div class="signup-container">
     <h1>Signup</h1>
-    <form action="/signup" method="POST">
+    <form method="POST" action="" name="signup">
+        {{ form.hidden_tag() }}
         <label for="name">Name:</label>
-        <input type="text" id="name" name="name" required>
-        
+        {{ form.name }}
+
         <label for="email">Email:</label>
-        <input type="email" id="email" name="email" required>
-        
+        {{ form.email }}
+
         <label for="password">Password:</label>
-        <input type="password" id="password" name="password" required>
-        
-        <button type="submit">Sign Up</button>
+        {{ form.password }}
+
+        {{ form.submit }}
     </form>
 </div>
 
 <p id="message"></p>
-<p class="signup-link">Already have an account? <a href="login.html">Login</a></p>
+<p class="signup-link">Already have an account? <a href="{{ url_for('login') }}">Login</a></p>
 {% endblock %}
