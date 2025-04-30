@@ -1,30 +1,9 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="style.css" />
-    <link rel="icon" href="/static/images/web_favicon.png" type="image/png">
+{% extends "base.html" %}
+{% block title %}About{% endblock %}
 
-    <title>About</title>
-</head>
-<body>
-
-    <header>
-        <nav>
-          <ul>
-            <li><a href="login.html">Login</a></li>
-            <li><a href="calc.html">Macro Calc</a></li>
-            <li><a href="results.html">Results</a></li>
-            <li><a href="profile.html">Profile</a></li>
-            <li><a href="about.html">About Us</a></li>
-            <li><a href="home.html"> Home</a></li>
-          </ul>
-        </nav>
-      </header>
-  <section>
-    <h1>About</h1>
-    <p>this is a placeholder paragraph where we will explain our website</p>
-  </section>
-</body>
-</html>
+{% block content %}
+<section>
+  <h1>About</h1>
+  <p>This is a placeholder paragraph where we will explain our website.</p>
+</section>
+{% endblock %}

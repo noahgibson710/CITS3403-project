@@ -28,21 +28,12 @@
       };
       localStorage.setItem("calcResults", JSON.stringify(resultsData));
 
-      // Optional: Show results on this page
-      const resultDiv = document.getElementById('result');
-      resultDiv.innerHTML = `
-        Gender: ${gender.charAt(0).toUpperCase() + gender.slice(1)}<br>
-        Age: ${age} <br>
-        Weight: ${weight} kg <br>
-        Height: ${height} cm <br>
-        <strong>BMR: ${bmr.toFixed(2)} calories/day</strong><br>
-        <strong>TDEE: ${tdee.toFixed(2)} calories/day</strong><br><br>
-        Redirecting to Results page...
-      `;
+      // Show spinner
+      document.getElementById("loading-spinner").style.display = "flex";
 
       // Redirect after short delay
       setTimeout(() => {
-        window.location.href = "results.html";
+        window.location.href = "/results";
       }, 1500);
     }
 

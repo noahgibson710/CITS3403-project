@@ -46,6 +46,20 @@ def logout():
 def results():
     return render_template("results.html")
 
+@app.route("/profile")
+def profile():
+    # Example: fetch the current user if logged in, otherwise show placeholders
+    user = None
+    if "user" in session:
+        user = User.query.filter_by(name=session["user"]).first()
+    return render_template("profile.html", user=user)
+
+
+@app.route("/about")
+def about():
+    return render_template("about.html")
+
+
 
 # Handle the POST request
 # @app.route("/api/signup", methods=["GET", 'POST'])

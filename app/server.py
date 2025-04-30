@@ -1,4 +1,4 @@
-from flask import Flask, request, session, redirect, send_from_directory, jsonify
+from flask import Flask, render_template, request, session, redirect, send_from_directory, jsonify
 from flask_cors import CORS
 from models import db, User
 import re
@@ -26,7 +26,8 @@ with app.app_context():
 
 @app.route("/")
 def home():
-    return redirect("/static/home.html")
+    return render_template("home.html")
+
 
 @app.route("/login")
 def login_page():

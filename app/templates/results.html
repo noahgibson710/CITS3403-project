@@ -1,15 +1,39 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>Calorie Intake Time Series</title>
-  <script src="https://code.highcharts.com/highcharts.js"></script>
-  <link rel="stylesheet" href="style.css" />
-</head>
-<body>
+{% extends "base.html" %}
 
+{% block title %}Calorie Intake Time Series{% endblock %}
+
+{% block content %}
+<section>
+    <h1>Your Health Macro Results</h1>
+    <div id="results-container" style="text-align:center; font-size: 1.1rem; margin-top: 2rem;"></div>
+
+    <div style="text-align:center; margin-top: 30px;">
+      <a href="/calculator">
+        <button style="background-color: #ff6b6b; color: #000; font-weight: bold; padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer;">
+          Recalculate
+        </button>
+      </a>
+    </div>
+  </section>
+
+  <script>
+    const data = JSON.parse(localStorage.getItem("calcResults"));
+    const container = document.getElementById("results-container");
+
+    if (data) {
+      container.innerHTML = `
+        <p><strong>Gender:</strong> ${data.gender.charAt(0).toUpperCase() + data.gender.slice(1)}</p>
+        <p><strong>Age:</strong> ${data.age}</p>
+        <p><strong>Weight:</strong> ${data.weight} kg</p>
+        <p><strong>Height:</strong> ${data.height} cm</p>
+        <p><strong>BMR:</strong> ${data.bmr} calories/day</p>
+        <p><strong>TDEE:</strong> ${data.tdee} calories/day</p>
+      `;
+    } else {
+      container.innerHTML = "<p style='color:#ff6b6b;'>❌ No results found. Please calculate your macros first on the <a href='calc.html' style='color:#6bffff; text-decoration:underline;'>Macro Calc</a> page.</p>";
+    }
+  </script>
 <div id="calorieChart"></div>
-
-<script src="./results.js"> </script>
-
-</body>
-</html>
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="{{ url_for('static', filename='js/results.js') }}"></script>
+{% endblock %}

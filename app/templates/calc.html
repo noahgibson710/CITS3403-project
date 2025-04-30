@@ -39,7 +39,13 @@
   <button type="submit">Calculate</button>
 </form>
 
-<div id="result" style="margin-top: 20px; font-weight: bold;"></div>
+<div id="loading-spinner" class="overlay-spinner" style="display: none;">
+  <div class="spinner"></div>
+  <p class="spinner-text">Calculating your results...</p>
+</div>
+
+
+
 </body>
 
 {% endblock %}
