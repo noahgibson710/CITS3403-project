@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}Profile Page{% endblock %}
+
+{% block content %}
+<div class="profile-container">
+    <header class="profile-header">
+        <h1>Profile Page</h1>
+    </header>
+    <section class="profile-info">
+        <img src="{{ url_for('static', filename='images/placeholder-profile.jpg') }}" alt="Profile Picture" class="profile-picture">
+        <h2 id="username">Username: {{ user.username if user else '[Placeholder]' }}</h2>
+        <p id="email">Email: {{ user.email if user else '[Placeholder]' }}</p>
+    </section>
+    <section class="profile-details">
+        <h3>Additional Information</h3>
+        <ul>
+            <li>Gender: {{ user.gender if user else '[Placeholder]' }}</li>
+            <li>Age: {{ user.age if user else '[Placeholder]' }}</li>
+            <li>Weight: {{ user.weight if user else '[Placeholder]' }}</li>
+            <li>Height: {{ user.height if user else '[Placeholder]' }}</li>
+            <li>Activity Level: {{ user.activity_level if user else '[Placeholder]' }}</li>
+        </ul>
+    </section>
+</div>
+{% endblock %}
