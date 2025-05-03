@@ -1,30 +1,40 @@
-  {% extends "base.html" %}
-  {% block title %}Home{% endblock %}
-  
-  {% block content %}
-  
-  <div class="hero">
-    <h1>Welcome to the Health Macro Calculator</h1>
-    <p>
-      Track your nutrition, monitor your progress, and reach your health goals.
-      Our tool calculates recommended macros based on your personal information
-      and fitness objectives.
-    </p>
-    <div class="cta">
-      <a href=" {{ url_for('login') }} ">Login</a>
-      <a href="{{ url_for('signup') }}">Sign Up</a>
-    </div>
+{% extends "base.html" %}
+{% block title %}Home{% endblock %}
+
+{% block content %}
+
+<div class="hero">
+  <h1>Welcome to the Health Macro Calculator</h1>
+  <p>
+    Track your nutrition, monitor your progress, and reach your health goals.
+    Our tool calculates recommended macros based on your personal information
+    and fitness objectives.
+  </p>
+  <div class="cta">
+    <a href="{{ url_for('login') }}">Login</a>
+    <a href="{{ url_for('signup') }}">Sign Up</a>
   </div>
+</div>
 
-  <section>
-    <h2>Why Use Our Macro Calculator?</h2>
-    <p>
-      Our calculator provides precise estimates of your daily macronutrient
-      requirements (protein, carbohydrates, and fats) to help you reach your
-      fitness goals. Whether you're trying to lose weight, build muscle, or
-      maintain a healthy lifestyle, understanding your macros is key.
-    </p>
-  </section>
+<section class="feed">
+  <h2>Community Feed</h2>
 
-  {% endblock %}
-  
+  <!-- Placeholder post form -->
+  <form action="#" method="POST" class="post-form">
+    <textarea name="post" rows="3" placeholder="Share your macro results... (e.g. Protein: 150g, Carbs: 200g, Fats: 70g)"></textarea>
+    <button type="submit">Post</button>
+  </form>
+
+  <!-- Placeholder posts -->
+  <div class="post">
+    <p><strong>@jane_doe:</strong> Hit my macros today! Protein: 120g, Carbs: 180g, Fats: 60g 💪</p>
+  </div>
+  <div class="post">
+    <p><strong>@fitguy21:</strong> New goal set! Cutting phase: Protein 160g, Carbs 150g, Fats 50g 🔥</p>
+  </div>
+  <div class="post">
+    <p><strong>@wellnessqueen:</strong> Maintenance day - feeling great! Protein 130g, Carbs 200g, Fats 70g 🥗</p>
+  </div>
+</section>
+
+{% endblock %}

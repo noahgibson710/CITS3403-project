@@ -1,9 +1,9 @@
-from flask import Blueprint, render_template
-from flask import Flask, request, session, redirect, send_from_directory, jsonify
+from flask import Flask, request, session, redirect, send_from_directory, jsonify, url_for, Blueprint, render_template
 from app import app
 from app.forms import SignupForm, LoginForm
 # app = Blueprint("app", __name__)
 from app.models import User  # Assuming you have a User model defined in models.py
+from app.models import MacroPost  # Assuming you have a MacroPost model defined in models.py
 from app import db
 
 @app.route("/")
@@ -48,11 +48,14 @@ def results():
 
 @app.route("/profile")
 def profile():
-    # Example: fetch the current user if logged in, otherwise show placeholders
     user = None
+    macro_posts = []
     if "user" in session:
         user = User.query.filter_by(name=session["user"]).first()
-    return render_template("profile.html", user=user)
+        if user:
+            macro_posts = MacroPost.query.filter_by(user_id=user.id).order_by(MacroPost.timestamp.desc()).all()
+    return render_template("profile.html", user=user, macro_posts=macro_posts)
+
 
 
 @app.route("/about")
@@ -119,6 +122,35 @@ def web_favicon():
         'web_favicon',
         mimetype='image/png'
     )
+
+@app.route("/save_results", methods=["POST"])
+def save_results():
+    # Expecting JSON data from the frontend
+    data = request.json
+
+    # Assuming the user is logged in and has a session with their name
+    user = User.query.filter_by(name=session["user"]).first()
+
+    if user:
+        # Save the macro results to the MacroPost table
+        new_post = MacroPost(
+            gender=data['gender'],
+            age=data['age'],
+            weight=data['weight'],
+            height=data['height'],
+            bmr=data['bmr'],
+            tdee=data['tdee'],
+            user_id=user.id  # User ID from the session
+        )
+
+        # Add to the session and commit to save to the database
+        db.session.add(new_post)
+        db.session.commit()
+
+        return jsonify({"message": "Macro results saved successfully"}), 200
+    else:
+        return jsonify({"error": "User not logged in"}), 401
+
 
 # Run the server
 if __name__ == "__app__":

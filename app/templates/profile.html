@@ -12,15 +12,30 @@
         <h2 id="username">Username: {{ user.username if user else '[Placeholder]' }}</h2>
         <p id="email">Email: {{ user.email if user else '[Placeholder]' }}</p>
     </section>
-    <section class="profile-details">
-        <h3>Additional Information</h3>
-        <ul>
-            <li>Gender: {{ user.gender if user else '[Placeholder]' }}</li>
-            <li>Age: {{ user.age if user else '[Placeholder]' }}</li>
-            <li>Weight: {{ user.weight if user else '[Placeholder]' }}</li>
-            <li>Height: {{ user.height if user else '[Placeholder]' }}</li>
-            <li>Activity Level: {{ user.activity_level if user else '[Placeholder]' }}</li>
-        </ul>
+    <section class="macro-history">
+        <h3>Macro History</h3>
+        {% if macro_posts %}
+            <ul>
+                {% for post in macro_posts %}
+                    <li>
+                        <strong>Date:</strong> {{ post.timestamp.strftime('%Y-%m-%d %H:%M') }}<br>
+                        <strong>Weight:</strong> {{ post.weight }} kg<br>
+                        <strong>BMR:</strong> {{ post.bmr }} cal/day,
+                        <strong>TDEE:</strong> {{ post.tdee }} cal/day
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>You haven't saved any results yet.</p>
+        {% endif %}
     </section>
+</div>
+
+<div class="theme-toggle">
+    <label class="theme-label" for="theme-switch">Toggle Theme</label>
+    <label class="switch">
+    <input type="checkbox" id="theme-switch" onchange="toggleTheme()" />
+    <span class="slider"></span>
+    </label>
 </div>
 {% endblock %}
