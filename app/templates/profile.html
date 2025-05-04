@@ -7,11 +7,18 @@
     <header class="profile-header">
         <h1>Profile Page</h1>
     </header>
+
     <section class="profile-info">
         <img src="{{ url_for('static', filename='images/placeholder-profile.jpg') }}" alt="Profile Picture" class="profile-picture">
         <h2 id="username">Username: {{ user.username if user else '[Placeholder]' }}</h2>
         <p id="email">Email: {{ user.email if user else '[Placeholder]' }}</p>
     </section>
+
+    <section class="graph-placeholder">
+        <h3>Macro History Graph (Placeholder)</h3>
+        <div id="macro-history-graph" style="width: 100%; height: 400px; margin-bottom: 20px;"></div>
+    </section>
+
     <section class="macro-history">
         <h3>Macro History</h3>
         {% if macro_posts %}
@@ -34,8 +41,37 @@
 <div class="theme-toggle">
     <label class="theme-label" for="theme-switch">Toggle Theme</label>
     <label class="switch">
-    <input type="checkbox" id="theme-switch" onchange="toggleTheme()" />
-    <span class="slider"></span>
+        <input type="checkbox" id="theme-switch" onchange="toggleTheme()" />
+        <span class="slider"></span>
     </label>
 </div>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<script>
+    // Initialize the Highcharts graph with a placeholder configuration
+    Highcharts.chart('macro-history-graph', {
+        chart: {
+            type: 'line'
+        },
+        title: {
+            text: 'Macro History (Placeholder)'
+        },
+        xAxis: {
+            categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun']
+        },
+        yAxis: {
+            title: {
+                text: 'Value'
+            }
+        },
+        series: [{
+            name: 'Weight',
+            data: [70, 72, 71, 73, 74, 75]  // <-- visible, non-zero line
+        }]
+
+    });
+</script>
 {% endblock %}
