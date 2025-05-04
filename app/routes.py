@@ -2,8 +2,7 @@ from flask import Flask, request, session, redirect, send_from_directory, jsonif
 from app import app
 from app.forms import SignupForm, LoginForm
 # app = Blueprint("app", __name__)
-from app.models import User  # Assuming you have a User model defined in models.py
-from app.models import MacroPost  # Assuming you have a MacroPost model defined in models.py
+from app.models import User, MacroPost
 from app import db
 
 @app.route("/")
@@ -48,13 +47,16 @@ def results():
 
 @app.route("/profile")
 def profile():
-    user = None
-    macro_posts = []
-    if "user" in session:
-        user = User.query.filter_by(name=session["user"]).first()
-        if user:
-            macro_posts = MacroPost.query.filter_by(user_id=user.id).order_by(MacroPost.timestamp.desc()).all()
+    if "user" not in session:
+        return redirect("/login")  # Block access if not logged in
+
+    user = User.query.filter_by(name=session["user"]).first()
+    if not user:
+        return redirect("/login")
+
+    macro_posts = MacroPost.query.filter_by(user_id=user.id).order_by(MacroPost.timestamp.desc()).all()
     return render_template("profile.html", user=user, macro_posts=macro_posts)
+
 
 
 
@@ -62,35 +64,6 @@ def profile():
 def about():
     return render_template("about.html")
 
-
-
-# Handle the POST request
-# @app.route("/api/signup", methods=["GET", 'POST'])
-# def signup():
-#     username = request.form.get('name')
-#     email = request.form.get('email')
-#     password = request.form.get('password')
-
-#     print(f"Received: {username}, {email}, {password}")   #debugging, showing on console
-
-#     if not re.match(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\W).{8,}$', password): #Return an error if the signup password does not meet the requirement
-#         return jsonify({"signup-message": "Password must be at least 8 characters and include uppercase, lowercase, and special character."}), 4002
-#     existing = User.query.filter(User.username == username).first()  #Return an error signup-message if user name exists 
-#     if existing:
-#         return jsonify({"signup-message": "User already exists. Please log in instead"}), 400
-
-#     if User.query.filter_by(email=email).first():  #Return an error signup-message if email is already used
-#         return jsonify({"signup-message": "Email is already registered. Please use a different email."}), 400
-    
-#     try:
-#         user = User(username=username, email=email, password=password)   #Save to database
-#         db.session.add(user)
-#         db.session.commit()
-#     except Exception as e:
-#         db.session.rollback()
-#         return jsonify({"signup-message": "User already exists. Please log in instead"}), 400
-
-#     return jsonify({'message': 'Signup successful!'}), 200
 
 @app.route("/signup", methods=["POST", "GET"])
 def signup():
