@@ -16,25 +16,15 @@
   </div>
 </div>
 
-<section class="feed">
-  <h2>Community Feed</h2>
+{% for post in feed_posts %}
+    <div class="post">
+        <p><strong>@{{ post.user.name }}:</strong> {{ post.content }}</p>
+        <small>{{ post.timestamp.strftime('%Y-%m-%d %H:%M') }}</small>
+    </div>
+{% else %}
+    <p>No community posts yet. Be the first to share!</p>
+{% endfor %}
 
-  <!-- Placeholder post form -->
-  <form action="#" method="POST" class="post-form">
-    <textarea name="post" rows="3" placeholder="Share your macro results... (e.g. Protein: 150g, Carbs: 200g, Fats: 70g)"></textarea>
-    <button type="submit">Post</button>
-  </form>
 
-  <!-- Placeholder posts -->
-  <div class="post">
-    <p><strong>@jane_doe:</strong> Hit my macros today! Protein: 120g, Carbs: 180g, Fats: 60g 💪</p>
-  </div>
-  <div class="post">
-    <p><strong>@fitguy21:</strong> New goal set! Cutting phase: Protein 160g, Carbs 150g, Fats 50g 🔥</p>
-  </div>
-  <div class="post">
-    <p><strong>@wellnessqueen:</strong> Maintenance day - feeling great! Protein 130g, Carbs 200g, Fats 70g 🥗</p>
-  </div>
-</section>
 
 {% endblock %}

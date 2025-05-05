@@ -10,15 +10,25 @@
 
     <section class="profile-info">
         <img src="{{ url_for('static', filename='images/placeholder-profile.jpg') }}" alt="Profile Picture" class="profile-picture">
-        <h2 id="username">Username: {{ user.username if user else '[Placeholder]' }}</h2>
+        <h2 id="username">Username: {{ user.name if user else '[Placeholder]' }}</h2>
         <p id="email">Email: {{ user.email if user else '[Placeholder]' }}</p>
     </section>
 
-    <section class="graph-placeholder">
-        <h3>Macro History Graph (Placeholder)</h3>
+    <section class="graph">
+        <h3>Macro History Graph</h3>
         <div id="macro-history-graph" style="width: 100%; height: 400px; margin-bottom: 20px;"></div>
+        <form action="{{ url_for('share_to_feed') }}" method="POST" style="margin-bottom: 30px;">
+            {% if macro_posts %}
+                <input type="hidden" name="content" value="Latest Macro Stats - Weight: {{ macro_posts[-1].weight }}kg, BMR: {{ macro_posts[-1].bmr }}, TDEE: {{ macro_posts[-1].tdee }}">
+            {% else %}
+                <input type="hidden" name="content" value="No macro stats available.">
+            {% endif %}
+                    <button type="submit">Share to Community Feed</button>
+        </form>
     </section>
 
+    
+    
     <section class="macro-history">
         <h3>Macro History</h3>
         {% if macro_posts %}
@@ -49,29 +59,47 @@
 {% endblock %}
 
 {% block scripts %}
+<script>
+    const macroData = {
+        dates: [{% for post in macro_posts[::-1] %}"{{ post.timestamp.strftime('%Y-%m-%d') }}"{% if not loop.last %}, {% endif %}{% endfor %}],
+        weights: [{% for post in macro_posts[::-1] %}{{ post.weight }}{% if not loop.last %}, {% endif %}{% endfor %}],
+        bmr: [{% for post in macro_posts[::-1] %}{{ post.bmr }}{% if not loop.last %}, {% endif %}{% endfor %}],
+        tdee: [{% for post in macro_posts[::-1] %}{{ post.tdee }}{% if not loop.last %}, {% endif %}{% endfor %}]
+    };
+</script>
 <script src="https://code.highcharts.com/highcharts.js"></script>
 <script>
-    // Initialize the Highcharts graph with a placeholder configuration
     Highcharts.chart('macro-history-graph', {
         chart: {
             type: 'line'
         },
         title: {
-            text: 'Macro History (Placeholder)'
+            text: 'Macro History'
         },
         xAxis: {
-            categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun']
+            categories: macroData.dates,
+            title: { text: 'Date' }
         },
         yAxis: {
             title: {
-                text: 'Value'
+                text: 'Values' 
             }
         },
-        series: [{
-            name: 'Weight',
-            data: [70, 72, 71, 73, 74, 75]  // <-- visible, non-zero line
-        }]
-
+        series: [
+            {
+                name: 'Weight (kg)',
+                data: macroData.weights
+            },
+            {
+                name: 'BMR (cal/day)',
+                data: macroData.bmr
+            },
+            {
+                name: 'TDEE (cal/day)',
+                data: macroData.tdee
+            }
+        ]
     });
 </script>
+
 {% endblock %}

@@ -1,13 +1,16 @@
 from flask import Flask, request, session, redirect, send_from_directory, jsonify, url_for, Blueprint, render_template
+from flask_login import login_required, current_user
 from app import app
 from app.forms import SignupForm, LoginForm
 # app = Blueprint("app", __name__)
-from app.models import User, MacroPost
+from app.models import User, MacroPost, FeedPost
 from app import db
 
-@app.route("/")
+@app.route('/')
 def home():
-    return render_template("home.html")
+    feed_posts = FeedPost.query.order_by(FeedPost.timestamp.desc()).all()
+    return render_template('home.html', feed_posts=feed_posts)
+
 
 
 @app.route("/login", methods=["GET", "POST"])
@@ -123,6 +126,17 @@ def save_results():
         return jsonify({"message": "Macro results saved successfully"}), 200
     else:
         return jsonify({"error": "User not logged in"}), 401
+    
+@app.route('/share-to-feed', methods=['POST'])
+@login_required
+def share_to_feed():
+    content = request.form.get('content')
+    if content:
+        post = FeedPost(content=content, user_id=current_user.id)
+        db.session.add(post)
+        db.session.commit()
+    return redirect(url_for('profile'))  # or url_for('home') to go straight to feed
+
 
 
 # Run the server
