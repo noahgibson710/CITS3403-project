@@ -25,6 +25,8 @@ document.addEventListener("DOMContentLoaded", () => {
       .then(response => {
         if (response.message) {
           alert(response.message);
+          localStorage.removeItem("calcResults"); // Clear local storage
+          window.location.href = "/profile";   // Redirect to calculator page
         } else {
           alert("Error saving results: " + (response.error || "Unknown error"));
         }
@@ -33,8 +35,9 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
   } else {
-    container.innerHTML = "<p style='color:#ff6b6b;'>❌ No results found. Please calculate your macros first on the <a href='calc.html' style='color:#6bffff; text-decoration:underline;'>Macro Calc</a> page.</p>";
+    container.innerHTML = "<p style='color:#ff6b6b;'>❌ No results found. Please calculate your macros first on the <a href='/calculator' style='color:#6bffff; text-decoration:underline;'>Macro Calc</a> page.</p>";
   }
+  
 
   // Plot calorie chart (example data)
   Highcharts.chart('calorieChart', {
