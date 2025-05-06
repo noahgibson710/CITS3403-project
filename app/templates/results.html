@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}Calorie Intake Time Series{% endblock %}
+
+{% block content %}
+<section>
+    <h1>Your Health Macro Results</h1>
+    <div id="results-container" style="text-align:center; font-size: 1.1rem; margin-top: 2rem;"></div>
+
+    <div style="text-align:center; margin-top: 30px;">
+        <a href="/calculator">
+            <button style="background-color: #ff6b6b; color: #000; font-weight: bold; padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer;">
+                Recalculate
+            </button>
+        </a>
+    </div>
+
+    <div style="text-align:center; margin-top: 30px;">
+        <button id="saveResultsBtn" style="background-color: #4CAF50; color: white; font-weight: bold; padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer;">
+            Save Results
+        </button>
+    </div> 
+</section>
+
+<script src="{{ url_for('static', filename='js/results.js') }}"></script>
+{% endblock %}

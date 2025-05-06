@@ -1,5 +1,6 @@
-from flask import Flask, request, session, redirect, send_from_directory, jsonify
+from flask import Flask, render_template, request, session, redirect, send_from_directory, jsonify
 from flask_cors import CORS
+from flask_login import LoginManager
 from models import db, User
 import re
 import os
@@ -22,11 +23,23 @@ with app.app_context():
         db.session.add(User(username='admin', email ='admin@example.com', password='12345678'))
         db.session.commit()
 
+# Initialize the login manager
+login_manager = LoginManager()
+login_manager.init_app(app)
+
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))  # Assuming you have a User model with an `id` field
+
+# Optionally, set the login view (URL to redirect unauthenticated users)
+login_manager.login_view = 'login'  # Change to your login route
+
 # === ROUTES ===
 
 @app.route("/")
 def home():
-    return redirect("/static/home.html")
+    return render_template("home.html")
+
 
 @app.route("/login")
 def login_page():

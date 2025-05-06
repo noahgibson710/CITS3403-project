@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Home{% endblock %}
+
+{% block content %}
+
+<div class="hero">
+  <h1>Welcome to the Health Macro Calculator</h1>
+  <p>
+    Track your nutrition, monitor your progress, and reach your health goals.
+    Our tool calculates recommended macros based on your personal information
+    and fitness objectives.
+  </p>
+  <div class="cta">
+    <a href="{{ url_for('login') }}">Login</a>
+    <a href="{{ url_for('signup') }}">Sign Up</a>
+  </div>
+</div>
+
+{% for post in feed_posts %}
+    <div class="post">
+        <p><strong>@{{ post.user.name }}:</strong> {{ post.content }}</p>
+        <small>{{ post.timestamp.strftime('%Y-%m-%d %H:%M') }}</small>
+    </div>
+{% else %}
+    <p>No community posts yet. Be the first to share!</p>
+{% endfor %}
+
+
+
+{% endblock %}
