@@ -58,9 +58,15 @@ def profile():
         return redirect("/login")
 
     macro_posts = MacroPost.query.filter_by(user_id=user.id).order_by(MacroPost.timestamp.desc()).all()
+    print(len(macro_posts))
     return render_template("profile.html", user=user, macro_posts=macro_posts)
 
-
+@app.route('/delete_macro_post/<int:post_id>', methods=['POST'])
+def delete_macro_post(post_id):
+    post = MacroPost.query.get_or_404(post_id)
+    db.session.delete(post)
+    db.session.commit()
+    return redirect(url_for('profile'))
 
 
 @app.route("/about")
