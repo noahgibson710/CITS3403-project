@@ -73,7 +73,49 @@ def feed():
     if "user" not in session:
         return render_template("community.html", login_required=True)
     
-    return render_template("community.html", login_required=False)
+    # Get all feed posts
+    posts = FeedPost.query.order_by(FeedPost.timestamp.desc()).all()
+    
+    # Get user's macro posts for the dropdown
+    user = User.query.filter_by(name=session["user"]).first()
+    user_macros = MacroPost.query.filter_by(user_id=user.id).order_by(MacroPost.timestamp.desc()).all()
+    
+    return render_template("community.html", login_required=False, posts=posts, user_macros=user_macros)
+
+@app.route("/create_feed_post", methods=["POST"])
+def create_feed_post():
+    if "user" not in session:
+        return redirect(url_for("login"))
+    
+    content = request.form.get("content")
+    macro_post_id = request.form.get("macro_post_id")
+    
+    if not content:
+        return redirect(url_for("feed"))
+    
+    user = User.query.filter_by(name=session["user"]).first()
+    
+    # Create new feed post
+    new_post = FeedPost(
+        content=content,
+        user_id=user.id
+    )
+    
+    # If macro results were selected, add them to the post
+    if macro_post_id:
+        macro_post = MacroPost.query.get(macro_post_id)
+        if macro_post and macro_post.user_id == user.id:
+            new_post.gender = macro_post.gender
+            new_post.age = macro_post.age
+            new_post.weight = macro_post.weight
+            new_post.height = macro_post.height
+            new_post.bmr = macro_post.bmr
+            new_post.tdee = macro_post.tdee
+    
+    db.session.add(new_post)
+    db.session.commit()
+    
+    return redirect(url_for("feed"))
 
 @app.route("/about")
 def about():
