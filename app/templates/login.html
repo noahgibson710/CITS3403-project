@@ -4,17 +4,23 @@
 
 <div class="signup-container">
   <h1>Login</h1>
-  <form method="POST" action = "" name = "login">
+  <form method="POST" name="login">
     {{ form.hidden_tag() }}
 
-    <label>Email:</label>
-    {{ form.email }}
+    <label for="email">Email:</label>
+    {{ form.email(id="email") }}
 
-    <label>Password:</label>
-    {{ form.password }} {{ form.submit(id="loginForm") }}
+    <label for="password">Password:</label>
+    {{ form.password(id="password") }}
+
+    {{ form.submit(id="loginForm") }}
   </form>
+
+  {% if error %}
+    <p class="error-message" style="color: red;">{{ error }}</p>
+  {% endif %}
 </div>
-<p id="message"></p>
+
 <p class="signup-link">
   Don't have an account? <a href="{{ url_for('signup') }}">Sign up here</a>
 </p>
