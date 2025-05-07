@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}Community Feed{% endblock %}
+
+{% block content %}
+<div class="container">
+  <h1>Community Feed</h1>
+  <div class="feed">
+    {% if login_required %}
+      <h2>Welcome, you must log in to view posts</h2>
+      <p class="signup-link"><a href="{{ url_for('login') }}">Login</a></p>
+
+    {% else %}
+     
+      {% if "user" in session %}
+        <h2>Welcome, {{ session["user"] }}!</h2>
+        
+      {% else %}
+        <h2>Welcome, Guest!</h2>
+      {% endif %}   
+  
+
+      {% if posts %}
+        <h2>Recent Posts</h2>
+        {% for post in posts %}
+          <div class="post">
+            <h2>{{ post.title }}</h2>
+            <p>{{ post.content }}</p>
+            <p><strong>Posted by:</strong> {{ post.username }}</p>
+            <p><strong>Date:</strong> {{ post.date_posted.strftime('%Y-%m-%d') }}</p>
+          </div>
+        {% endfor %}
+      {% else %}
+        <h2>No posts available yet.</h2>
+        <p>Be the first to create a post!</p>
+      {% endif %}   
+  
+    {% endif %}     
+
+  <!-- <form method="GET" action="{{ url_for('feed') }}">
+    <h2>Create a New Post</h2>
+    <input type="text" name="title" placeholder="Post Title" required />
+    <textarea name="content" placeholder="Post Content" required></textarea>
+    <button type="submit">Submit</button>
+  </form> -->
+
+{% endblock %}
