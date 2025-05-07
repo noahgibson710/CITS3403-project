@@ -31,3 +31,11 @@ class FeedPost(db.Model):
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     user = db.relationship('User', backref='feed_posts')
+    
+    # Macro results fields
+    gender = db.Column(db.String(10))
+    age = db.Column(db.Integer)
+    weight = db.Column(db.Float)
+    height = db.Column(db.Float)
+    bmr = db.Column(db.Float)
+    tdee = db.Column(db.Float)
