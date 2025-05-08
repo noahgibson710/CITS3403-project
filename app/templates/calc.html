@@ -12,13 +12,13 @@
 <form onsubmit="calculate(event)">
   <label for="gender">Gender:</label><br>
   <select id="gender" name="gender" required>
-    <option value="" disabled selected>Select your gender</option>
-    <option value="male">Male</option>
-    <option value="female">Female</option>
+    <option value="" disabled {% if not gender %}selected{% endif %}>Select your gender</option>
+    <option value="male" {% if gender == 'male' %}selected{% endif %}>Male</option>
+    <option value="female" {% if gender == 'female' %}selected{% endif %}>Female</option>
   </select><br><br>
 
   <label for="age">Age (21–70):</label><br>
-  <input type="number" id="age" name="age" min="21" max="70" required><br><br>
+  <input type="number" id="age" name="age" min="21" max="70" required value="{{ age if age else '' }}"><br><br>
 
   <label for="weight">Weight (25.0–124.9 kg):</label><br>
   <input type="number" id="weight" min="25.0" max="124.9" step="0.1" placeholder="Weight in kilograms" required><br><br>

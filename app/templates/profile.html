@@ -19,8 +19,8 @@
                 <option value="male" {% if user.gender == 'male' %}selected{% endif %}>Male</option>
                 <option value="female" {% if user.gender == 'female' %}selected{% endif %}>Female</option>
             </select>
-            <label for="age">Age:</label>
-            <input type="number" id="age" name="age" min="10" max="120" value="{{ user.age if user.age else '' }}" required>
+            <label for="age">Age (21–70):</label>
+            <input type="number" id="age" name="age" min="21" max="70" value="{{ user.age if user.age else '' }}" required>
             <button type="submit" style="margin-top: 1em; background-color: #4CAF50; color: white; font-weight: bold; padding: 8px 16px; border: none; border-radius: 8px; cursor: pointer;">Save Gender & Age</button>
         </form>
     </section>

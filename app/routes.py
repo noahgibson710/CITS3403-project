@@ -32,7 +32,12 @@ def login():
 
 @app.route("/calculator", methods=["GET", "POST"])
 def calculator():
-    return render_template("calc.html")
+    gender = None
+    age = None
+    if current_user.is_authenticated:
+        gender = current_user.gender
+        age = current_user.age
+    return render_template("calc.html", gender=gender, age=age)
 
 @app.route("/dashboard")
 @login_required
