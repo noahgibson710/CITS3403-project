@@ -1,17 +1,20 @@
-from flask import Flask, request, session, redirect, send_from_directory, jsonify, url_for, Blueprint, render_template
-from flask_login import login_required, current_user
+from flask import Flask, request, redirect, send_from_directory, jsonify, url_for, Blueprint, render_template, flash
+from flask_login import login_required, current_user, login_user, logout_user
 from app import app
 from app.forms import SignupForm, LoginForm
 # app = Blueprint("app", __name__)
 from app.models import User, MacroPost, FeedPost
 from app import db
+from datetime import datetime
+from sqlalchemy.orm import joinedload
+
+
+global logged_in
 
 @app.route('/')
 def home():
     feed_posts = FeedPost.query.order_by(FeedPost.timestamp.desc()).all()
     return render_template('home.html', feed_posts=feed_posts)
-
-
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -19,13 +22,11 @@ def login():
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
         if user and user.password == form.password.data:
-            session["user"] = user.name
-            print("User logged in:", user.name)
+            login_user(user)
+            logged_in = True
+            return redirect("/profile")
         else:
-            print("Invalid credentials")
             return render_template("login.html", form=form, error="Invalid credentials")
-
-        return redirect("/profile")  # or wherever you want after login
     return render_template("login.html", form=form)
 
 
@@ -34,14 +35,13 @@ def calculator():
     return render_template("calc.html")
 
 @app.route("/dashboard")
+@login_required
 def dashboard():
-    if "user" in session:
-        return f"<h2>Welcome {session['user']}!</h2><br><a href='/logout'>Logout</a>"
-    return redirect("/login")
+    return f"<h2>Welcome {current_user.name}!</h2><br><a href='/logout'>Logout</a>"
 
 @app.route("/logout")
 def logout():
-    session.pop("user", None)
+    logout_user()
     return redirect("/")
 
 @app.route("/results")
@@ -49,17 +49,10 @@ def results():
     return render_template("results.html")
 
 @app.route("/profile")
+@login_required
 def profile():
-    if "user" not in session:
-        return redirect("/login")  # Block access if not logged in
-
-    user = User.query.filter_by(name=session["user"]).first()
-    if not user:
-        return redirect("/login")
-    
-    macro_posts = MacroPost.query.filter_by(user_id=user.id).order_by(MacroPost.timestamp.desc()).all()
-    print(len(macro_posts))
-    return render_template("profile.html", user=user, macro_posts=macro_posts)
+    macro_posts = MacroPost.query.filter_by(user_id=current_user.id).order_by(MacroPost.timestamp.desc()).all()
+    return render_template("profile.html", user=current_user, macro_posts=macro_posts)
 
 @app.route('/delete_macro_post/<int:post_id>', methods=['POST'])
 def delete_macro_post(post_id):
@@ -69,48 +62,57 @@ def delete_macro_post(post_id):
     return redirect(url_for('profile'))
 
 @app.route("/feed", methods=["GET"])
-def feed():
-    if "user" not in session:
-        return render_template("community.html", login_required=True)
-    
+@login_required
+def feed():    
     # Get all feed posts
-    posts = FeedPost.query.order_by(FeedPost.timestamp.desc()).all()
+
+    posts = (FeedPost.query
+                .options(
+                  joinedload(FeedPost.user),
+                  joinedload(FeedPost.macro_post)
+                )
+                .order_by(FeedPost.timestamp.desc())
+                .all())
+    # feed_posts = FeedPost.query.order_by(FeedPost.timestamp.desc()).all()
+    # posts = MacroPost.query.order_by(MacroPost.timestamp.desc()).all()
     
     # Get user's macro posts for the dropdown
-    user = User.query.filter_by(name=session["user"]).first()
-    user_macros = MacroPost.query.filter_by(user_id=user.id).order_by(MacroPost.timestamp.desc()).all()
+    # user_macros = MacroPost.query.filter_by(user_id=current_user.id).order_by(MacroPost.timestamp.desc()).all()
     
-    return render_template("community.html", login_required=False, posts=posts, user_macros=user_macros)
+    return render_template("community.html",  posts=posts)
 
-@app.route("/create_feed_post", methods=["POST"])
-def create_feed_post():
-    if "user" not in session:
-        return redirect(url_for("login"))
+@login_required
+@app.route("/create_feed_post/<int:post_id>", methods=["POST"])
+def create_feed_post(post_id):
+    # user = User.query.filter_by(name=session["user"]).first()
+    # content = request.form.get("content")
+    # macro_post_id = request.form.get("macro_post_id")
+    post = MacroPost.query.get_or_404(post_id)
+    # user = db.relationship('User', backref='macroposts')
+    print(current_user)
+    user_who_shared_id = current_user.id
+
+
+    # if not content:
+    #     return redirect(url_for("feed"))
     
-    content = request.form.get("content")
-    macro_post_id = request.form.get("macro_post_id")
-    
-    if not content:
-        return redirect(url_for("feed"))
-    
-    user = User.query.filter_by(name=session["user"]).first()
     
     # Create new feed post
     new_post = FeedPost(
-        content=content,
-        user_id=user.id
+        user_id=user_who_shared_id,
+        macro_post_id= post.id
     )
     
     # If macro results were selected, add them to the post
-    if macro_post_id:
-        macro_post = MacroPost.query.get(macro_post_id)
-        if macro_post and macro_post.user_id == user.id:
-            new_post.gender = macro_post.gender
-            new_post.age = macro_post.age
-            new_post.weight = macro_post.weight
-            new_post.height = macro_post.height
-            new_post.bmr = macro_post.bmr
-            new_post.tdee = macro_post.tdee
+    # if macro_post_id:
+    #     macro_post = MacroPost.query.get(macro_post_id)
+    #     if macro_post and macro_post.user_id == user.id:
+    #         new_post.gender = macro_post.gender
+    #         new_post.age = macro_post.age
+    #         new_post.weight = macro_post.weight
+    #         new_post.height = macro_post.height
+    #         new_post.bmr = macro_post.bmr
+    #         new_post.tdee = macro_post.tdee
     
     db.session.add(new_post)
     db.session.commit()
@@ -154,42 +156,37 @@ def web_favicon():
     )
 
 @app.route("/save_results", methods=["POST"])
-def save_results():
-    # Expecting JSON data from the frontend
-    data = request.json
-
-    # Assuming the user is logged in and has a session with their name
-    user = User.query.filter_by(name=session["user"]).first()
-
-    if user:
-        # Save the macro results to the MacroPost table
-        new_post = MacroPost(
-            gender=data['gender'],
-            age=data['age'],
-            weight=data['weight'],
-            height=data['height'],
-            bmr=data['bmr'],
-            tdee=data['tdee'],
-            user_id=user.id  # User ID from the session
-        )
-
-        # Add to the session and commit to save to the database
-        db.session.add(new_post)
-        db.session.commit()
-
-        return jsonify({"message": "Macro results saved successfully"}), 200
-    else:
-        return jsonify({"error": "User not logged in"}), 401
-    
-@app.route('/share-to-feed', methods=['POST'])
 @login_required
-def share_to_feed():
-    content = request.form.get('content')
-    if content:
-        post = FeedPost(content=content, user_id=current_user.id)
-        db.session.add(post)
-        db.session.commit()
-    return redirect(url_for('profile'))  # or url_for('home') to go straight to feed
+def save_results():
+    data = request.json
+    new_post = MacroPost(
+        gender=data['gender'],
+        age=data['age'],
+        weight=data['weight'],
+        height=data['height'],
+        bmr=data['bmr'],
+        tdee=data['tdee'],
+        user_id=current_user.id
+    )
+    db.session.add(new_post)
+    db.session.commit()
+    return jsonify({"message": "Macro results saved successfully"}), 200
+
+# @app.route('/share_to_feed', methods=['POST'])
+# @login_required
+# def share_to_feed():
+#     if request.method == 'POST':
+#         content = request.form['content']
+#         timestamp = datetime.utcnow()
+#         user_id = current_user.id
+
+#         new_post = FeedPost(content=content, timestamp=timestamp, user_id=user_id)
+#         db.session.add(new_post)
+#         db.session.commit()
+
+#         flash("Post shared successfully", 'success')
+#         return redirect(url_for('feed'))
+
 
 
 
