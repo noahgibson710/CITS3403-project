@@ -13,8 +13,11 @@ global logged_in
 
 @app.route('/')
 def home():
+    if current_user.is_authenticated:
+        return redirect(url_for('profile'))
     feed_posts = FeedPost.query.order_by(FeedPost.timestamp.desc()).all()
     return render_template('home.html', feed_posts=feed_posts)
+
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
