@@ -520,3 +520,22 @@ body.light-mode .hero p {
   height: 400px;
   margin-bottom: 20px;
 }
+
+/* Error state for form inputs */
+input.error, select.error, textarea.error {
+  border: 2px solid #d13438; /* Red border for error */
+  background-color: #f8d7da; /* Light red background */
+}
+
+input.error:focus, select.error:focus, textarea.error:focus {
+  box-shadow: 0 0 5px#d13438; /* Red shadow when focused */
+}
+
+/* Error message styling */
+.error-message {
+  color: #d13438;
+  font-size: 1rem;
+  margin-top: 0.5rem;
+  text-align: center;
+  font-weight: bold;
+}

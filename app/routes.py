@@ -1,4 +1,4 @@
-from flask import Flask, request, redirect, send_from_directory, jsonify, url_for, Blueprint, render_template, flash
+from flask import Flask, request, redirect, send_from_directory, jsonify, url_for, Blueprint, render_template, flash, abort
 from flask_login import login_required, current_user, login_user, logout_user
 from app import app
 from app.forms import SignupForm, LoginForm
@@ -7,9 +7,6 @@ from app.models import User, MacroPost, FeedPost
 from app import db
 from datetime import datetime
 from sqlalchemy.orm import joinedload
-
-
-global logged_in
 
 @app.route('/')
 def home():
@@ -23,7 +20,6 @@ def login():
         user = User.query.filter_by(email=form.email.data).first()
         if user and user.password == form.password.data:
             login_user(user)
-            logged_in = True
             return redirect("/profile")
         else:
             return render_template("login.html", form=form, error="Invalid credentials")
@@ -55,10 +51,23 @@ def profile():
     return render_template("profile.html", user=current_user, macro_posts=macro_posts)
 
 @app.route('/delete_macro_post/<int:post_id>', methods=['POST'])
+@login_required
 def delete_macro_post(post_id):
+    # 1) Fetch the macro post (404 if not found)
     post = MacroPost.query.get_or_404(post_id)
+
+    # 2) Security: only its owner may delete it
+    if post.user_id != current_user.id:
+        abort(403)
+
+    # 3) Delete any feed entries that point to this macro post
+    FeedPost.query.filter_by(macro_post_id=post.id).delete()
+
+    # 4) Now delete the macro post itself
     db.session.delete(post)
     db.session.commit()
+
+    flash('Your macro entry was successfully deleted.', 'success')
     return redirect(url_for('profile'))
 
 @app.route("/feed", methods=["GET"])
@@ -72,47 +81,21 @@ def feed():
                   joinedload(FeedPost.macro_post)
                 )
                 .order_by(FeedPost.timestamp.desc())
-                .all())
-    # feed_posts = FeedPost.query.order_by(FeedPost.timestamp.desc()).all()
-    # posts = MacroPost.query.order_by(MacroPost.timestamp.desc()).all()
-    
-    # Get user's macro posts for the dropdown
-    # user_macros = MacroPost.query.filter_by(user_id=current_user.id).order_by(MacroPost.timestamp.desc()).all()
-    
+                .all())    
     return render_template("community.html",  posts=posts)
 
 @login_required
 @app.route("/create_feed_post/<int:post_id>", methods=["POST"])
 def create_feed_post(post_id):
-    # user = User.query.filter_by(name=session["user"]).first()
-    # content = request.form.get("content")
-    # macro_post_id = request.form.get("macro_post_id")
     post = MacroPost.query.get_or_404(post_id)
-    # user = db.relationship('User', backref='macroposts')
     print(current_user)
     user_who_shared_id = current_user.id
-
-
-    # if not content:
-    #     return redirect(url_for("feed"))
-    
     
     # Create new feed post
     new_post = FeedPost(
         user_id=user_who_shared_id,
         macro_post_id= post.id
     )
-    
-    # If macro results were selected, add them to the post
-    # if macro_post_id:
-    #     macro_post = MacroPost.query.get(macro_post_id)
-    #     if macro_post and macro_post.user_id == user.id:
-    #         new_post.gender = macro_post.gender
-    #         new_post.age = macro_post.age
-    #         new_post.weight = macro_post.weight
-    #         new_post.height = macro_post.height
-    #         new_post.bmr = macro_post.bmr
-    #         new_post.tdee = macro_post.tdee
     
     db.session.add(new_post)
     db.session.commit()
@@ -128,23 +111,26 @@ def about():
 def signup():
     form = SignupForm()
     if form.validate_on_submit():
-        print("Received: ", form.name.data, form.email.data, form.password.data)
+        # Check if the email already exists in the database
+        existing_user = User.query.filter_by(email=form.email.data).first()
+        if existing_user:
+            # Add an error to the form if the email is already taken
+            form.email.errors.append('Email is already registered, please use a different one.')
+            return render_template('signup.html', form=form)
+
+        # If the email doesn't exist, create the new user and add to the database
         user = User(name=form.name.data, email=form.email.data, password=form.password.data)
         db.session.add(user)
         db.session.commit()
         return redirect("/login")
-    else:
-        return render_template('signup.html', form=form)
+
+    return render_template('signup.html', form=form)
+
 
 # Static file serving (CSS, JS, etc.)
 @app.route("/<path:filename>")
 def static_files(filename):
     return send_from_directory("static", filename)
-
-# Optional: Suppress favicon error
-@app.route("/favicon.ico")
-def favicon():
-    return "", 204
 
 # favicon
 @app.route('/favicon.ico')
@@ -171,22 +157,6 @@ def save_results():
     db.session.add(new_post)
     db.session.commit()
     return jsonify({"message": "Macro results saved successfully"}), 200
-
-# @app.route('/share_to_feed', methods=['POST'])
-# @login_required
-# def share_to_feed():
-#     if request.method == 'POST':
-#         content = request.form['content']
-#         timestamp = datetime.utcnow()
-#         user_id = current_user.id
-
-#         new_post = FeedPost(content=content, timestamp=timestamp, user_id=user_id)
-#         db.session.add(new_post)
-#         db.session.commit()
-
-#         flash("Post shared successfully", 'success')
-#         return redirect(url_for('feed'))
-
 
 
 

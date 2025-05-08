@@ -4,6 +4,19 @@
 
 <div class="signup-container">
     <h1>Signup</h1>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="flash-messages">
+                {% for category, message in messages %}
+                    <div class="message {{ category }}">
+                        <p>{{ message }}</p>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
     <form method="POST" name="signup">
         {{ form.hidden_tag() }}
 
@@ -33,4 +46,5 @@
 <p class="signup-link">
     Already have an account? <a href="{{ url_for('login') }}">Login</a>
 </p>
+
 {% endblock %}
