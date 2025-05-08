@@ -16,22 +16,4 @@
   </div>
 </div>
 
-<section class="community-posts">
-  <h2>Community Posts</h2>
-  {% if feed_posts %}
-    <div class="macro-history">
-      {% for post in feed_posts %}
-        <div>
-          <p><strong>@{{ post.user.name }}:</strong> {{ post.content }}</p>
-          <small>{{ post.timestamp.strftime('%Y-%m-%d %H:%M') }}</small>
-        </div>
-      {% endfor %}
-    </div>
-  {% else %}
-    <p>No community posts yet. Be the first to share!</p>
-  {% endif %}
-</section>
-
-
-
 {% endblock %}
