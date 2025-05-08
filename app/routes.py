@@ -175,8 +175,22 @@ def save_results():
 #         flash("Post shared successfully", 'success')
 #         return redirect(url_for('feed'))
 
-
-
+@app.route('/update_profile_info', methods=['POST'])
+@login_required
+def update_profile_info():
+    gender = request.form.get('gender')
+    age = request.form.get('age')
+    if gender:
+        current_user.gender = gender
+    if age:
+        try:
+            current_user.age = int(age)
+        except ValueError:
+            flash('Invalid age value.', 'danger')
+            return redirect(url_for('profile'))
+    db.session.commit()
+    flash('Profile updated successfully!', 'success')
+    return redirect(url_for('profile'))
 
 # Run the server
 if __name__ == "__app__":
