@@ -189,13 +189,16 @@ def update_profile_info():
         current_user.gender = gender
     if age:
         try:
-            current_user.age = int(age)
+            age_int = int(age)
+            if age_int < 21 or age_int > 70:
+                flash('Age must be between 21 and 70.', 'danger')
+                return redirect(url_for('profile'))
+            current_user.age = age_int
         except ValueError:
             flash('Invalid age value.', 'danger')
             return redirect(url_for('profile'))
     db.session.commit()
-    flash('Profile updated successfully!', 'success')
-    return redirect(url_for('profile'))
+    return redirect(url_for('profile', updated='1'))
 
 # Run the server
 if __name__ == "__app__":
