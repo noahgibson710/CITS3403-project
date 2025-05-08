@@ -256,7 +256,6 @@ section p {
   margin-bottom: 15px;
 }
 
-
 #signup-message {
   text-align: center;
   font-weight: bold;
@@ -264,18 +263,20 @@ section p {
   border-radius: 5px;
   margin-bottom: 15px;
 }
+
 #signup-message.success {
   color: #155724;
-  background-color: #d4edda;
 }
+
 #signup-message.error {
   color: #721c24;
-  background-color: #f8d7da;
 }
+
 #show-password-checkbox {
   width: auto;
   transform: scale(1.2); 
   margin-right: 8px;
+  margin-top: 3px;
   transform: scale(1.2);
   vertical-align: middle;
 }
@@ -391,8 +392,6 @@ section p {
   font-size: 0.9rem;
 }
 
-
-
 .theme-toggle {
   position: fixed;
   bottom: 1rem;  
@@ -402,7 +401,6 @@ section p {
   gap: 0.5rem;
   z-index: 10000; 
 }
-
 
 .theme-label {
   color: #ff6b6b;
