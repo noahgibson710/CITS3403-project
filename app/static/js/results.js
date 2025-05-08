@@ -45,9 +45,27 @@ document.addEventListener("DOMContentLoaded", () => {
         .then(response => response.json())
         .then(response => {
           if (response.message) {
-            alert(response.message);
-            localStorage.removeItem("calcResults");
-            window.location.href = "/results"; // Refresh to show updated history
+            // Show a styled popup message
+            const popup = document.createElement('div');
+            popup.id = 'save-success-popup';
+            popup.style.position = 'fixed';
+            popup.style.top = '30px';
+            popup.style.left = '50%';
+            popup.style.transform = 'translateX(-50%)';
+            popup.style.background = '#4CAF50';
+            popup.style.color = 'white';
+            popup.style.padding = '1em 2em';
+            popup.style.borderRadius = '10px';
+            popup.style.fontSize = '1.2rem';
+            popup.style.zIndex = '1000';
+            popup.style.boxShadow = '0 2px 10px #0008';
+            popup.innerText = 'Results saved successfully!';
+            document.body.appendChild(popup);
+            setTimeout(() => {
+              popup.style.display = 'none';
+              localStorage.removeItem("calcResults");
+              window.location.href = "/results";
+            }, 2500);
           } else {
             alert("Error saving results: " + (response.error || "Unknown error"));
           }

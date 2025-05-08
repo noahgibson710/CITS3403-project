@@ -32,7 +32,12 @@ def login():
 
 @app.route("/calculator", methods=["GET", "POST"])
 def calculator():
-    return render_template("calc.html")
+    gender = None
+    age = None
+    if current_user.is_authenticated:
+        gender = current_user.gender
+        age = current_user.age
+    return render_template("calc.html", gender=gender, age=age)
 
 @app.route("/dashboard")
 @login_required
@@ -175,8 +180,25 @@ def save_results():
 #         flash("Post shared successfully", 'success')
 #         return redirect(url_for('feed'))
 
-
-
+@app.route('/update_profile_info', methods=['POST'])
+@login_required
+def update_profile_info():
+    gender = request.form.get('gender')
+    age = request.form.get('age')
+    if gender:
+        current_user.gender = gender
+    if age:
+        try:
+            age_int = int(age)
+            if age_int < 21 or age_int > 70:
+                flash('Age must be between 21 and 70.', 'danger')
+                return redirect(url_for('profile'))
+            current_user.age = age_int
+        except ValueError:
+            flash('Invalid age value.', 'danger')
+            return redirect(url_for('profile'))
+    db.session.commit()
+    return redirect(url_for('profile', updated='1'))
 
 # Run the server
 if __name__ == "__app__":
