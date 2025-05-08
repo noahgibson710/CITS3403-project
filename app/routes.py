@@ -60,6 +60,8 @@ def profile():
 @app.route('/delete_macro_post/<int:post_id>', methods=['POST'])
 def delete_macro_post(post_id):
     post = MacroPost.query.get_or_404(post_id)
+    # Delete all feed posts that reference this macro post
+    FeedPost.query.filter_by(macro_post_id=post.id).delete()
     db.session.delete(post)
     db.session.commit()
     return redirect(url_for('profile'))
@@ -87,39 +89,22 @@ def feed():
 @login_required
 @app.route("/create_feed_post/<int:post_id>", methods=["POST"])
 def create_feed_post(post_id):
-    # user = User.query.filter_by(name=session["user"]).first()
-    # content = request.form.get("content")
-    # macro_post_id = request.form.get("macro_post_id")
     post = MacroPost.query.get_or_404(post_id)
-    # user = db.relationship('User', backref='macroposts')
-    print(current_user)
     user_who_shared_id = current_user.id
 
+    # Prevent duplicate posts: check if this macro_post has already been shared by this user
+    existing_post = FeedPost.query.filter_by(user_id=user_who_shared_id, macro_post_id=post.id).first()
+    if existing_post:
+        flash("You have already shared this result to the community feed.", "warning")
+        return redirect(url_for("feed"))
 
-    # if not content:
-    #     return redirect(url_for("feed"))
-    
-    
-    # Create new feed post
     new_post = FeedPost(
         user_id=user_who_shared_id,
-        macro_post_id= post.id
+        macro_post_id=post.id
     )
-    
-    # If macro results were selected, add them to the post
-    # if macro_post_id:
-    #     macro_post = MacroPost.query.get(macro_post_id)
-    #     if macro_post and macro_post.user_id == user.id:
-    #         new_post.gender = macro_post.gender
-    #         new_post.age = macro_post.age
-    #         new_post.weight = macro_post.weight
-    #         new_post.height = macro_post.height
-    #         new_post.bmr = macro_post.bmr
-    #         new_post.tdee = macro_post.tdee
-    
     db.session.add(new_post)
     db.session.commit()
-    
+    flash("Result shared to community feed!", "success")
     return redirect(url_for("feed"))
 
 @app.route("/about")

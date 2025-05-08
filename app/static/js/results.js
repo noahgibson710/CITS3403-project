@@ -2,7 +2,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const data = JSON.parse(localStorage.getItem("calcResults"));
   const container = document.getElementById("results-container");
   const saveWrapper = document.getElementById("save-results-wrapper");
-  const saveButton = document.getElementById("saveResultsBtn");
 
   if (data) {
     container.innerHTML = `
@@ -12,9 +11,28 @@ document.addEventListener("DOMContentLoaded", () => {
       <p><strong>Height:</strong> ${data.height} cm</p>
       <p><strong>BMR:</strong> ${data.bmr} calories/day</p>
       <p><strong>TDEE:</strong> ${data.tdee} calories/day</p>
+      <div style="text-align:center; margin-top: 30px;">
+        <a href="/calculator">
+          <button style="background-color: #ff6b6b; color: #000; font-weight: bold; padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer;">
+            Recalculate
+          </button>
+        </a>
+      </div>
+      <div id="save-results-wrapper" style="text-align:center; margin-top: 30px;">
+        <button id="saveResultsBtn" style="background-color: #4CAF50; color: white; font-weight: bold; padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer;">
+          Save Results
+        </button>
+      </div>
     `;
 
-    // Only attach the save event if there is data to save
+    // Hide the no-results-message if present
+    const noResultsMsg = document.querySelector('.no-results-message');
+    if (noResultsMsg) {
+      noResultsMsg.style.display = 'none';
+    }
+
+    // Attach the event listener AFTER the button is in the DOM
+    const saveButton = document.getElementById("saveResultsBtn");
     if (saveButton) {
       saveButton.addEventListener("click", () => {
         fetch('/save_results', {

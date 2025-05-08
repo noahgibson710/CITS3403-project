@@ -5,7 +5,9 @@
 {% block content %}
 <section>
     <h1>Your Health Macro Results</h1>
-    <div id="results-container" style="text-align:center; font-size: 1.1rem; margin-top: 2rem;"></div>
+    <div id="results-container" style="text-align:center; font-size: 1.1rem; margin-top: 2rem;">
+        <!-- The JS will inject the most recent result and the Save/Recalculate buttons here if there is a new calculation -->
+    </div>
     {% if macro_posts and macro_posts|length > 0 %}
         <div class="macro-history" style="margin-top: 2rem;">
             <ul>
@@ -18,29 +20,21 @@
                         <p><strong>Height:</strong> {{ post.height }} cm</p>
                         <p><strong>BMR:</strong> {{ post.bmr }} calories/day</p>
                         <p><strong>TDEE:</strong> {{ post.tdee }} calories/day</p>
+                        <form action="{{ url_for('delete_macro_post', post_id=post.id) }}" method="POST" style="display:inline-block; margin: 0 10px;">
+                            <button type="submit" onclick="return confirm('Are you sure you want to delete this entry?');" style="background-color: #ff6b6b; color: #fff; font-weight: bold; padding: 8px 16px; border: none; border-radius: 8px; cursor: pointer;">Delete</button>
+                        </form>
+                        <form action="{{ url_for('create_feed_post', post_id=post.id) }}" method="POST" style="display:inline-block; margin: 0 10px;">
+                            <button type="submit" style="background-color: #4CAF50; color: #fff; font-weight: bold; padding: 8px 16px; border: none; border-radius: 8px; cursor: pointer;">Share to Community Feed</button>
+                        </form>
                     </li>
                 {% endfor %}
             </ul>
         </div>
     {% else %}
-        <div style="text-align:center; font-size: 1.1rem; margin-top: 2rem;">
+        <div class="no-results-message" style="text-align:center; font-size: 1.1rem; margin-top: 2rem;">
             <p style='color:#ff6b6b;'>❌ No results found. Please calculate your macros first on the <a href='/calculator' style='color:#6bffff; text-decoration:underline;'>Macro Calc</a> page.</p>
         </div>
     {% endif %}
-
-    <div style="text-align:center; margin-top: 30px;">
-        <a href="/calculator">
-            <button style="background-color: #ff6b6b; color: #000; font-weight: bold; padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer;">
-                Recalculate
-            </button>
-        </a>
-    </div>
-
-    <div id="save-results-wrapper" style="text-align:center; margin-top: 30px;">
-        <button id="saveResultsBtn" style="background-color: #4CAF50; color: white; font-weight: bold; padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer;">
-            Save Results
-        </button>
-    </div> 
 </section>
 
 <script src="{{ url_for('static', filename='js/results.js') }}"></script>
