@@ -5,6 +5,44 @@
 <div class="container">
   <h1>Community Feed</h1>
   <div class="feed">
+    {% if login_required %}
+      <h2>Welcome, you must log in to view posts</h2>
+      <p class="signup-link"><a href="{{ url_for('login') }}">Login</a></p>
+
+    {% endif %}
+
+      <!-- {% if  %} -->
+        <!-- <h2>Welcome, {{  }}!</h2> --> -->
+        
+        <!-- Post Creation Form -->
+        <!-- <div class="post-form">
+          <h3>Share Your Macro Results</h3>
+          <form method="POST" action="{{ url_for('create_feed_post') }}">
+            <div class="form-group">
+              <label for="content">Share your thoughts:</label>
+              <textarea name="content" id="content" rows="3" placeholder="Share your fitness journey..." required></textarea>
+            </div>
+            
+            <div class="form-group">
+              <label>Include your latest macro results:</label>
+              <select name="macro_post_id" id="macro_post_id">
+                <option value="">Select your macro results</option>
+                {% for macro in user_macros %}
+                <option value="{{ macro.id }}">
+                  {{ macro.timestamp.strftime('%Y-%m-%d') }} - BMR: {{ "%.2f"|format(macro.bmr) }}, TDEE: {{ "%.2f"|format(macro.tdee) }}
+                </option>
+                {% endfor %}
+              </select>
+            </div>
+            
+            <button type="submit" class="btn btn-primary">Share to Feed</button>
+          </form>
+        </div>
+        
+      {% else %}
+        <h2>Welcome, Guest!</h2>
+      {% endif %}    -->
+
       {% if posts %}
         <h2>Recent Posts</h2>
         {% for post in posts %}
@@ -38,6 +76,7 @@
         <p>Be the first to create a post!</p>
       {% endif %}   
   
+    {% endif %}     
 
   </div>
 </div>
