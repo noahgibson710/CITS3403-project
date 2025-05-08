@@ -18,14 +18,7 @@
     <section class="graph">
         <h3>Macro History Graph</h3>
         <div id="macro-history-graph" style="width: 100%; height: 400px; margin-bottom: 20px;"></div>
-        <form action="{{ url_for('share_to_feed') }}" method="POST" style="margin-bottom: 30px;">
-            {% if macro_posts %}
-                <input type="hidden" name="content" value="Latest Macro Stats - Weight: {{ macro_posts[-1].weight }}kg, BMR: {{ macro_posts[-1].bmr }}, TDEE: {{ macro_posts[-1].tdee }}">
-            {% else %}
-                <input type="hidden" name="content" value="No macro stats available.">
-            {% endif %}
-                    <button type="submit">Share to Community Feed</button>
-        </form>
+
     </section>
 
     
@@ -40,8 +33,16 @@
                         <strong>Weight:</strong> {{ post.weight }} kg<br>
                         <strong>BMR:</strong> {{ post.bmr }} cal/day,
                         <strong>TDEE:</strong> {{ post.tdee }} cal/day
-                        <form action="{{ url_for('delete_macro_post', post_id=post.id) }}" method="POST" style="margin-top: 10px;">
+                        <form action="{{ url_for('delete_macro_post', post_id=post.id) }}" method="POST" style="inline">
                             <button type="submit" onclick="return confirm('Are you sure you want to delete this entry?');">Delete</button>
+                        </form>
+                        <form action="{{ url_for('create_feed_post', post_id = post.id) }}" method="POST" style="inline">
+                            {% if macro_posts %}
+                                <input type="hidden" name="content" value="Latest Macro Stats - Weight: {{ macro_posts[-1].weight }}kg, BMR: {{ macro_posts[-1].bmr }}, TDEE: {{ macro_posts[-1].tdee }}">
+                            {% else %}
+                                <input type="hidden" name="content" value="No macro stats available.">
+                            {% endif %}
+                                    <button type="submit">Share to Community Feed</button>
                         </form>
                         
                     </li>
