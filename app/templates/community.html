@@ -4,32 +4,28 @@
 {% block content %}
 <div class="container">
   <h1>Community Feed</h1>
-  <div class="feed">
+  <div class="community-posts macro-history">
       {% if posts %}
         <h2>Recent Posts</h2>
         {% for post in posts %}
-          <div class="post">
+          <div class="post" class="community-posts macro-history">
             <div class="post-header">
               <h3>{{ post.user.name }}</h3>
               <span class="post-date">{{ post.timestamp.strftime('%Y-%m-%d %H:%M') }}</span>
             </div>
             
-            <div class="post-content">
-              <p>{{ post.content }}</p>
-              
-              {% if post.bmr and post.tdee %}
-              <div class="macro-results">
+            <div class="post-content">              
+              <div class="macro-history">
                 <h4>Macro Results:</h4>
                 <ul>
-                  <li>Gender: {{ post.gender }}</li>
-                  <li>Age: {{ post.age }}</li>
-                  <li>Weight: {{ "%.1f"|format(post.weight) }} kg</li>
-                  <li>Height: {{ "%.1f"|format(post.height) }} cm</li>
-                  <li>BMR: {{ "%.2f"|format(post.bmr) }} calories</li>
-                  <li>TDEE: {{ "%.2f"|format(post.tdee) }} calories</li>
+                  <li>Gender: {{ post.macro_post.gender }}</li>
+                  <li>Age: {{ post.macro_post.age }}</li>
+                  <li>Weight: {{ "%.1f"|format(post.macro_post.weight) }} kg</li>
+                  <li>Height: {{ "%.1f"|format(post.macro_post.height) }} cm</li>
+                  <li>BMR: {{ "%.2f"|format(post.macro_post.bmr) }} calories</li>
+                  <li>TDEE: {{ "%.2f"|format(post.macro_post.tdee) }} calories</li>
                 </ul>
               </div>
-              {% endif %}
             </div>
           </div>
         {% endfor %}
@@ -54,7 +50,7 @@
 }
 
 .post-form {
-  background: #f8f9fa;
+  background: #657381;
   padding: 20px;
   border-radius: 8px;
   margin-bottom: 30px;
@@ -92,7 +88,7 @@ textarea, select {
 }
 
 .post {
-  background: white;
+  background: rgb(101, 90, 90);
   border: 1px solid #ddd;
   border-radius: 8px;
   padding: 20px;

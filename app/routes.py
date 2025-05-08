@@ -6,6 +6,8 @@ from app.forms import SignupForm, LoginForm
 from app.models import User, MacroPost, FeedPost
 from app import db
 from datetime import datetime
+from sqlalchemy.orm import joinedload
+
 
 global logged_in
 
@@ -63,7 +65,16 @@ def delete_macro_post(post_id):
 @login_required
 def feed():    
     # Get all feed posts
-    posts = FeedPost.query.order_by(FeedPost.timestamp.desc()).all()
+
+    posts = (FeedPost.query
+                .options(
+                  joinedload(FeedPost.user),
+                  joinedload(FeedPost.macro_post)
+                )
+                .order_by(FeedPost.timestamp.desc())
+                .all())
+    # feed_posts = FeedPost.query.order_by(FeedPost.timestamp.desc()).all()
+    # posts = MacroPost.query.order_by(MacroPost.timestamp.desc()).all()
     
     # Get user's macro posts for the dropdown
     # user_macros = MacroPost.query.filter_by(user_id=current_user.id).order_by(MacroPost.timestamp.desc()).all()
@@ -89,7 +100,7 @@ def create_feed_post(post_id):
     # Create new feed post
     new_post = FeedPost(
         user_id=user_who_shared_id,
-        post_id= post.id
+        macro_post_id= post.id
     )
     
     # If macro results were selected, add them to the post

@@ -28,10 +28,11 @@ class MacroPost(db.Model):
 class FeedPost(db.Model):
     feedpost_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     # content = db.Column(db.Text, nullable=False)
-    post_id = db.Column(db.Integer, nullable=False)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    macro_post_id = db.Column(db.Integer, db.ForeignKey('macro_post.id'), nullable=False)
     user = db.relationship('User', backref='feed_posts')
+    macro_post = db.relationship('MacroPost', backref='feed_entries')
     
     # Macro results fields
     # gender = db.Column(db.String(10))
