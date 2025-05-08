@@ -17,6 +17,9 @@
             <div class="post-content">              
               <div class="macro-history">
                 <h4>Macro Results:</h4>
+                <p style="color:#ffa07a; margin-bottom: 0.5em;">
+                  <strong>Result Calculated:</strong> {{ post.macro_post.timestamp.strftime('%Y-%m-%d %H:%M') }}
+                </p>
                 <ul>
                   <li>Gender: {{ post.macro_post.gender }}</li>
                   <li>Age: {{ post.macro_post.age }}</li>
