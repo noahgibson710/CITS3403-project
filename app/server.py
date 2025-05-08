@@ -23,10 +23,6 @@ with app.app_context():
         db.session.add(User(username='admin', email ='admin@example.com', password='12345678'))
         db.session.commit()
 
-# Initialize the login manager
-login_manager = LoginManager()
-login_manager.init_app(app)
-
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))  # Assuming you have a User model with an `id` field

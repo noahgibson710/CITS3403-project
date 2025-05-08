@@ -10,9 +10,10 @@
 
     <section class="profile-info">
         <img src="{{ url_for('static', filename='images/placeholder-profile.jpg') }}" alt="Profile Picture" class="profile-picture">
-        <h2 id="username">Username: {{ user.name if user else '[Placeholder]' }}</h2>
-        <p id="email">Email: {{ user.email if user else '[Placeholder]' }}</p>
+        <h2 id="username">Username: <strong>{{ user.name if user else '[Placeholder]' }}</strong></h2>
+        <p id="email">Email: <strong>{{ user.email if user else '[Placeholder]' }}</strong></p>
     </section>
+    
 
     <section class="graph">
         <h3>Macro History Graph</h3>
