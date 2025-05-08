@@ -1,6 +1,8 @@
 document.addEventListener("DOMContentLoaded", () => {
   const data = JSON.parse(localStorage.getItem("calcResults"));
   const container = document.getElementById("results-container");
+  const saveWrapper = document.getElementById("save-results-wrapper");
+  const saveButton = document.getElementById("saveResultsBtn");
 
   if (data) {
     container.innerHTML = `
@@ -12,30 +14,36 @@ document.addEventListener("DOMContentLoaded", () => {
       <p><strong>TDEE:</strong> ${data.tdee} calories/day</p>
     `;
 
-    const saveButton = document.getElementById("saveResultsBtn");
-    saveButton.addEventListener("click", () => {
-      fetch('/save_results', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(data)
-      })
-      .then(response => response.json())
-      .then(response => {
-        if (response.message) {
-          alert(response.message);
-          localStorage.removeItem("calcResults"); // Clear local storage
-          window.location.href = "/profile";   // Redirect to calculator page
-        } else {
-          alert("Error saving results: " + (response.error || "Unknown error"));
-        }
-      })
-      .catch(error => console.error('Error:', error));
-    });
-
+    // Only attach the save event if there is data to save
+    if (saveButton) {
+      saveButton.addEventListener("click", () => {
+        fetch('/save_results', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(data)
+        })
+        .then(response => response.json())
+        .then(response => {
+          if (response.message) {
+            alert(response.message);
+            localStorage.removeItem("calcResults");
+            window.location.href = "/results"; // Refresh to show updated history
+          } else {
+            alert("Error saving results: " + (response.error || "Unknown error"));
+          }
+        })
+        .catch(error => console.error('Error:', error));
+      });
+    }
   } else {
-    container.innerHTML = "<p style='color:#ff6b6b;'>❌ No results found. Please calculate your macros first on the <a href='/calculator' style='color:#6bffff; text-decoration:underline;'>Macro Calc</a> page.</p>";
+    // Only show the message if there is no macro history on the page
+    if (!document.querySelector('.macro-history')) {
+      container.innerHTML = "<p style='color:#ff6b6b;'>❌ No results found. Please calculate your macros first on the <a href='/calculator' style='color:#6bffff; text-decoration:underline;'>Macro Calc</a> page.</p>";
+    }
+    // Hide the save button if there's nothing to save
+    if (saveWrapper) saveWrapper.style.display = "none";
   }
   
 

@@ -46,7 +46,10 @@ def logout():
 
 @app.route("/results")
 def results():
-    return render_template("results.html")
+    macro_posts = []
+    if current_user.is_authenticated:
+        macro_posts = MacroPost.query.filter_by(user_id=current_user.id).order_by(MacroPost.timestamp.desc()).all()
+    return render_template("results.html", macro_posts=macro_posts)
 
 @app.route("/profile")
 @login_required

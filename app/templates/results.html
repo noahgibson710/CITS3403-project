@@ -6,6 +6,27 @@
 <section>
     <h1>Your Health Macro Results</h1>
     <div id="results-container" style="text-align:center; font-size: 1.1rem; margin-top: 2rem;"></div>
+    {% if macro_posts and macro_posts|length > 0 %}
+        <div class="macro-history" style="margin-top: 2rem;">
+            <ul>
+                {% for post in macro_posts %}
+                    <li style="margin-bottom: 1.5rem; text-align:center;">
+                        <p><strong>Date:</strong> {{ post.timestamp.strftime('%Y-%m-%d %H:%M') }}</p>
+                        <p><strong>Gender:</strong> {{ post.gender|capitalize }}</p>
+                        <p><strong>Age:</strong> {{ post.age }}</p>
+                        <p><strong>Weight:</strong> {{ post.weight }} kg</p>
+                        <p><strong>Height:</strong> {{ post.height }} cm</p>
+                        <p><strong>BMR:</strong> {{ post.bmr }} calories/day</p>
+                        <p><strong>TDEE:</strong> {{ post.tdee }} calories/day</p>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% else %}
+        <div style="text-align:center; font-size: 1.1rem; margin-top: 2rem;">
+            <p style='color:#ff6b6b;'>❌ No results found. Please calculate your macros first on the <a href='/calculator' style='color:#6bffff; text-decoration:underline;'>Macro Calc</a> page.</p>
+        </div>
+    {% endif %}
 
     <div style="text-align:center; margin-top: 30px;">
         <a href="/calculator">
@@ -15,7 +36,7 @@
         </a>
     </div>
 
-    <div style="text-align:center; margin-top: 30px;">
+    <div id="save-results-wrapper" style="text-align:center; margin-top: 30px;">
         <button id="saveResultsBtn" style="background-color: #4CAF50; color: white; font-weight: bold; padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer;">
             Save Results
         </button>
