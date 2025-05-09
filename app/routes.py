@@ -63,6 +63,7 @@ def profile():
     return render_template("profile.html", user=current_user, macro_posts=macro_posts)
 
 @app.route('/delete_macro_post/<int:post_id>', methods=['POST'])
+@login_required
 def delete_macro_post(post_id):
     post = MacroPost.query.get_or_404(post_id)
     # Delete all feed posts that reference this macro post
@@ -83,12 +84,6 @@ def feed():
                 )
                 .order_by(FeedPost.timestamp.desc())
                 .all())
-    # feed_posts = FeedPost.query.order_by(FeedPost.timestamp.desc()).all()
-    # posts = MacroPost.query.order_by(MacroPost.timestamp.desc()).all()
-    
-    # Get user's macro posts for the dropdown
-    # user_macros = MacroPost.query.filter_by(user_id=current_user.id).order_by(MacroPost.timestamp.desc()).all()
-    
     return render_template("community.html",  posts=posts)
 
 @login_required
@@ -164,21 +159,6 @@ def save_results():
     db.session.add(new_post)
     db.session.commit()
     return jsonify({"message": "Macro results saved successfully"}), 200
-
-# @app.route('/share_to_feed', methods=['POST'])
-# @login_required
-# def share_to_feed():
-#     if request.method == 'POST':
-#         content = request.form['content']
-#         timestamp = datetime.utcnow()
-#         user_id = current_user.id
-
-#         new_post = FeedPost(content=content, timestamp=timestamp, user_id=user_id)
-#         db.session.add(new_post)
-#         db.session.commit()
-
-#         flash("Post shared successfully", 'success')
-#         return redirect(url_for('feed'))
 
 @app.route('/update_profile_info', methods=['POST'])
 @login_required
