@@ -7,6 +7,8 @@ from app.models import User, MacroPost, FeedPost
 from app import db
 from datetime import datetime
 from sqlalchemy.orm import joinedload
+from werkzeug.security import generate_password_hash, check_password_hash
+
 
 
 global logged_in
@@ -21,13 +23,13 @@ def login():
     form = LoginForm()
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
-        if user and user.password == form.password.data:
+        if user and check_password_hash(user.password, form.password.data):
             login_user(user)
-            logged_in = True
             return redirect("/profile")
         else:
             return render_template("login.html", form=form, error="Invalid credentials")
     return render_template("login.html", form=form)
+
 
 
 @app.route("/calculator", methods=["GET", "POST"])
@@ -126,14 +128,15 @@ def signup():
                 if existing_name:
                     return jsonify({"error": "This name is already taken"}), 400
 
-                user = User(name=form.name.data, email=form.email.data, password=form.password.data)
+                hashed_password = generate_password_hash(form.password.data)
+                user = User(name=form.name.data, email=form.email.data, password=hashed_password)
                 db.session.add(user)
                 db.session.commit()
                 return jsonify({"message": "Signup successful"}), 200
             except Exception as e:
                 db.session.rollback()
                 print("DB error:", str(e))
-                return jsonify({"error": "Server error" }), 500
+                return jsonify({"error": "Server error"}), 500
 
     return render_template("signup.html", form=form)
 
