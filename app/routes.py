@@ -201,6 +201,50 @@ def update_profile_info():
     db.session.commit()
     return redirect(url_for('profile', updated='1'))
 
+@app.route('/update_profile_picture', methods=['POST'])
+@login_required
+def update_profile_picture():
+    form = ProfilePictureForm()
+    if form.validate_on_submit():
+        if form.picture.data:
+            # Save the picture
+            picture_file = form.picture.data
+            picture_filename = secrets.token_hex(8) + os.path.splitext(picture_file.filename)[1]
+            picture_path = os.path.join(app.root_path, 'static/profile_pics', picture_filename)
+            
+            # Create directory if it doesn't exist
+            os.makedirs(os.path.dirname(picture_path), exist_ok=True)
+            
+            # Save the file
+            picture_file.save(picture_path)
+            
+            # Update user's profile picture
+            current_user.profile_picture = picture_filename
+            db.session.commit()
+            flash('Profile picture updated successfully!', 'success')
+        else:
+            flash('No picture selected.', 'warning')
+    else:
+        for field, errors in form.errors.items():
+            for error in errors:
+                flash(f'{field}: {error}', 'danger')
+    return redirect(url_for('profile'))
+
+@app.route('/delete_profile_picture', methods=['POST'])
+@login_required
+def delete_profile_picture():
+    if current_user.profile_picture != 'placeholder-profile.jpg':
+        # Delete the old picture file
+        old_picture_path = os.path.join(app.root_path, 'static/profile_pics', current_user.profile_picture)
+        if os.path.exists(old_picture_path):
+            os.remove(old_picture_path)
+        
+        # Reset to default picture
+        current_user.profile_picture = 'placeholder-profile.jpg'
+        db.session.commit()
+        flash('Profile picture deleted successfully!', 'success')
+    return redirect(url_for('profile'))
+
 # Run the server
 if __name__ == "__app__":
     app.run(debug=True)
