@@ -1,13 +1,16 @@
-from flask import Flask, request, redirect, send_from_directory, jsonify, url_for, Blueprint, render_template, flash
+from flask import Flask, request, redirect, send_from_directory, jsonify, url_for, Blueprint, render_template, flash, current_app
 from flask_login import login_required, current_user, login_user, logout_user
 from app import app
-from app.forms import SignupForm, LoginForm
+from app.forms import SignupForm, LoginForm, ProfilePictureForm
 # app = Blueprint("app", __name__)
 from app.models import User, MacroPost, FeedPost, SharedPost
 from app import db
 from datetime import datetime
 from sqlalchemy.orm import joinedload
 from werkzeug.security import generate_password_hash, check_password_hash
+import os
+from PIL import Image
+import secrets
 
 
 
@@ -62,7 +65,8 @@ def results():
 @login_required
 def profile():
     macro_posts = MacroPost.query.filter_by(user_id=current_user.id).order_by(MacroPost.timestamp.desc()).all()
-    return render_template("profile.html", user=current_user, macro_posts=macro_posts)
+    form = ProfilePictureForm()
+    return render_template("profile.html", user=current_user, macro_posts=macro_posts, form=form)
 
 @app.route('/delete_macro_post/<int:post_id>', methods=['POST'])
 @login_required
@@ -197,79 +201,49 @@ def update_profile_info():
     db.session.commit()
     return redirect(url_for('profile', updated='1'))
 
-@app.route("/news")
-@login_required  # optional: restrict access to logged-in users
-def news():
-    return render_template("news.html")
-
-@app.route('/search_users', methods=['GET'])
+@app.route('/update_profile_picture', methods=['POST'])
 @login_required
-def search_users():
-    query = request.args.get('q', '')
-    results = []
-    if query:
-        users = User.query.filter(User.name.ilike(f"%{query}%")).all()
-        results = [{'id': user.id, 'name': user.name} for user in users if user.id != current_user.id]
-    return jsonify(results)
+def update_profile_picture():
+    form = ProfilePictureForm()
+    if form.validate_on_submit():
+        if form.picture.data:
+            # Save the picture
+            picture_file = form.picture.data
+            picture_filename = secrets.token_hex(8) + os.path.splitext(picture_file.filename)[1]
+            picture_path = os.path.join(app.root_path, 'static/profile_pics', picture_filename)
+            
+            # Create directory if it doesn't exist
+            os.makedirs(os.path.dirname(picture_path), exist_ok=True)
+            
+            # Save the file
+            picture_file.save(picture_path)
+            
+            # Update user's profile picture
+            current_user.profile_picture = picture_filename
+            db.session.commit()
+            flash('Profile picture updated successfully!', 'success')
+        else:
+            flash('No picture selected.', 'warning')
+    else:
+        for field, errors in form.errors.items():
+            for error in errors:
+                flash(f'{field}: {error}', 'danger')
+    return redirect(url_for('profile'))
 
-@app.route('/my_macroposts')
+@app.route('/delete_profile_picture', methods=['POST'])
 @login_required
-def get_my_macroposts():
-    posts = MacroPost.query.filter_by(user_id=current_user.id).order_by(MacroPost.timestamp.desc()).all()
-    return jsonify([
-        {
-            'id': post.id,
-            'age': post.age,
-            'weight': post.weight,
-            'height': post.height,
-            'bmr': post.bmr,
-            'tdee': post.tdee,
-            'timestamp': post.timestamp.strftime('%Y-%m-%d %H:%M')
-        }
-        for post in posts
-    ])
-
-@app.route('/share_post', methods=['POST'])
-@login_required
-def share_post():
-    data = request.get_json()
-    receiver_name = data.get('receiver')
-    post_id = data.get('post_id')
-
-    receiver = User.query.filter_by(name=receiver_name).first()
-    post = MacroPost.query.get(post_id)
-
-    if not receiver or not post or post.user_id != current_user.id:
-        return jsonify({'error': 'Invalid data'}), 400
-
-    shared = SharedPost(sender_id=current_user.id, receiver_id=receiver.id, post_id=post.id)
-    db.session.add(shared)
-    db.session.commit()
-
-    return jsonify({'message': 'Post shared successfully'})
-
-@app.route('/shared_posts')
-@login_required
-def shared_posts():
-    sent = SharedPost.query.filter_by(sender_id=current_user.id).all()
-    received = SharedPost.query.filter_by(receiver_id=current_user.id).all()
-
-    def format_post(sp):
-        return {
-            'id': sp.post.id,
-            'age': sp.post.age,
-            'weight': sp.post.weight,
-            'height': sp.post.height,
-            'tdee': sp.post.tdee,
-            'timestamp': sp.timestamp.strftime('%Y-%m-%d'),
-            'shared_with': sp.receiver.name if sp.sender_id == current_user.id else sp.sender.name
-        }
-
-    return jsonify({
-        'sent': [format_post(p) for p in sent],
-        'received': [format_post(p) for p in received]
-    })
-
+def delete_profile_picture():
+    if current_user.profile_picture != 'placeholder-profile.jpg':
+        # Delete the old picture file
+        old_picture_path = os.path.join(app.root_path, 'static/profile_pics', current_user.profile_picture)
+        if os.path.exists(old_picture_path):
+            os.remove(old_picture_path)
+        
+        # Reset to default picture
+        current_user.profile_picture = 'placeholder-profile.jpg'
+        db.session.commit()
+        flash('Profile picture deleted successfully!', 'success')
+    return redirect(url_for('profile'))
 
 # Run the server
 if __name__ == "__app__":

@@ -10,6 +10,7 @@ class User(db.Model, UserMixin):
     password = db.Column(db.String(120), nullable=False)
     gender = db.Column(db.String(10))
     age = db.Column(db.Integer)
+    profile_picture = db.Column(db.String(255), default='placeholder-profile.jpg')
 
 
 class MacroPost(db.Model):
