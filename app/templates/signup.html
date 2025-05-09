@@ -4,7 +4,7 @@
 
 <div class="signup-container">
     <h1>Signup</h1>
-    <form method="POST" name="signup">
+    <form method="POST" name="signupform" id="signupform">
         {{ form.hidden_tag() }}
 
         <label for="name">Name:</label>
@@ -16,21 +16,135 @@
         <label for="password">Password:</label>
         {{ form.password(id="password") }}
 
+        <label>
+            <input type="checkbox" id="show-password-checkbox"> Show password
+        </label>
+
         {{ form.submit(id="signupForm") }}
     </form>
 
-    {% if form.errors %}
-        <div class="error-message" style="color: red;">
-            {% for field_errors in form.errors.values() %}
-                {% for error in field_errors %}
-                    <p>{{ error }}</p>
-                {% endfor %}
-            {% endfor %}
-        </div>
-    {% endif %}
+    <div id="signup-message" style="
+    position: relative;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 15px;
+    width: 100%;
+ ">
+    <div id="signup-message-box" style="
+    display: flex;
+    align-items: center;
+    background: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeeba;
+    border-radius: 6px;
+    padding: 8px 14px;
+    font-size: 1rem;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    font-family: inherit;
+    width: 100%;
+    justify-content: center;
+ ">
+   <span id="signup-message-icon" style="font-size: 1.3em; margin-right: 8px;"></span>
+   <span id="signup-message-text"></span>
+ </div>
+ <div style="
+   position: absolute;
+   left: 50%;
+   transform: translateX(-50%);
+   top: 100%;
+   width: 0;
+   height: 0;
+   border-left: 10px solid transparent;
+   border-right: 10px solid transparent;
+   border-top: 10px solid #fff3cd;
+ "></div>
 </div>
 
 <p class="signup-link">
     Already have an account? <a href="{{ url_for('login') }}">Login</a>
 </p>
+{% endblock %}
+
+{% block scripts %}
+<script>
+//Send form data to server via POST method
+document.getElementById('signupform').addEventListener('submit', function (e) {
+   e.preventDefault();
+   
+   const formData = new FormData(this);
+   
+   let xhttp = new XMLHttpRequest();
+   xhttp.open("POST", "{{ url_for('signup') }}", true);
+   
+   let parameters = new URLSearchParams(formData).toString();
+   xhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded"); //HTTP request header
+   xhttp.send(parameters);
+   
+   xhttp.onload = function () {
+       const password = document.getElementById('password').value;
+       const message = document.getElementById("signup-message");
+       const messageText = document.getElementById("signup-message-text");
+       const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\W).{8,}$/; // A password needs to have at least: one lowercase + one uppercase + one special character + 8 characters long
+       
+       // Clear previous message
+       messageText.textContent = "";
+       message.removeAttribute("class");
+       
+       if (!passwordPattern.test(password)) {   //Password validation
+           messageText.textContent = "⚠ Password must be at least 8 characters long and include uppercase, lowercase, and a special character.";
+           message.className = "error";
+           message.style.display = "flex";
+           return;
+       }
+
+       if (xhttp.status == 200) {
+           messageText.textContent = "✅ Signup Successful!";
+           message.className = "success";
+           message.style.display = "flex";
+           message.querySelector("#signup-message > div:last-child").style.visibility = "hidden";
+           message.querySelector("#signup-message-box").style.boxShadow = "none";
+
+
+       } else {
+
+           try {
+               const response = JSON.parse(xhttp.responseText);
+        // Try to extract specific error message
+               if (response.error) {
+                   messageText.textContent = "⚠ " + response.error;
+               } else if (response.message) {
+                   messageText.textContent = "⚠ " + response.message;
+               } else if (response["signup-message"]) {
+                   messageText.textContent = "⚠ " + response["signup-message"];
+               } else {
+                   messageText.textContent = "⚠ Signup Failed!";
+               }
+           } catch (e) {
+               messageText.textContent = "⚠ Signup Failed!";
+           }
+           message.className = "error";
+           message.style.display = "flex";
+           message.querySelector("#signup-message-box").style.background = "#fff3cd";
+           message.querySelector("#signup-message-box").style.borderColor = "#ffeeba";
+       }
+   };
+});
+
+// When the input changes, remove signup-message
+document.querySelectorAll("#signupform input").forEach(input => {
+   input.addEventListener("input", function () {
+       const message = document.getElementById("signup-message");
+       message.style.display = "none";
+       document.getElementById("signup-message-text").textContent = "";
+       message.removeAttribute("class");
+   });
+});
+
+// Users can make their passwords visible when signing up so that they can check whether the password meets the requirement 
+document.getElementById('show-password-checkbox').addEventListener('change', function () {
+   const passwordField = document.getElementById('password');
+   passwordField.type = this.checked ? 'text' : 'password';
+});
+</script>
 {% endblock %}
