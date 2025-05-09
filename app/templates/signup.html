@@ -11,7 +11,7 @@
         {{ form.name(id="name") }}
 
         <label for="email">Email:</label>
-        {{ form.email(id="email") }}
+        {{ form.email(id="email", type="email") }}
 
         <label for="password">Password:</label>
         {{ form.password(id="password") }}
@@ -71,7 +71,23 @@
 //Send form data to server via POST method
 document.getElementById('signupform').addEventListener('submit', function (e) {
    e.preventDefault();
-   
+
+   const password = document.getElementById('password').value;
+   const message = document.getElementById("signup-message");
+   const messageText = document.getElementById("signup-message-text");
+   const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\W).{8,}$/;
+
+    // Clear previous message
+    messageText.textContent = "";
+    message.removeAttribute("class");
+
+    if (!passwordPattern.test(password)) {   //Password validation, if fails do not send data
+        messageText.textContent = "⚠ Password must be at least 8 characters long and include uppercase, lowercase, and a special character.";
+        message.className = "error";
+        message.style.display = "flex";
+        return;
+    }
+
    const formData = new FormData(this);
    
    let xhttp = new XMLHttpRequest();
@@ -82,21 +98,6 @@ document.getElementById('signupform').addEventListener('submit', function (e) {
    xhttp.send(parameters);
    
    xhttp.onload = function () {
-       const password = document.getElementById('password').value;
-       const message = document.getElementById("signup-message");
-       const messageText = document.getElementById("signup-message-text");
-       const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\W).{8,}$/; // A password needs to have at least: one lowercase + one uppercase + one special character + 8 characters long
-       
-       // Clear previous message
-       messageText.textContent = "";
-       message.removeAttribute("class");
-       
-       if (!passwordPattern.test(password)) {   //Password validation
-           messageText.textContent = "⚠ Password must be at least 8 characters long and include uppercase, lowercase, and a special character.";
-           message.className = "error";
-           message.style.display = "flex";
-           return;
-       }
 
        if (xhttp.status == 200) {
            messageText.textContent = "✅ Signup Successful!";

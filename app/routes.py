@@ -122,7 +122,7 @@ def signup():
                 if existing_user:
                     return jsonify({"error": "This email is already registered"}), 400
                 
-                existing_name = User.query.filter_by(name=form.name.data).first()
+                existing_name = User.query.filter(db.func.lower(User.name) == form.name.data.lower()).first()
                 if existing_name:
                     return jsonify({"error": "This name is already taken"}), 400
 
