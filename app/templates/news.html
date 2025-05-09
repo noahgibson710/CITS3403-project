@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <section class="news-section">
+    <h1>Peer-to-Peer News Sharing</h1>
+    <p class="subtext">Here is where you will find results other users have shared with you</p>
+
+    <!-- Search bar to find users to share with -->
+    <form method="GET" action="{{ url_for('news') }}" class="search-form">
+      <input type="text" name="search" placeholder="Search for users to share with..." required />
+      <button type="submit">Search</button>
+    </form>
+
+    <!-- Outbound sharing (e.g., user's shared posts) -->
+    <div class="news-container">
+      <h2>Posts You've Shared</h2>
+      <div class="news-post">
+        <!-- Placeholder for posts the current user has shared -->
+        <p>You haven’t shared anything yet.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="news-section">
+    <h2>Inbound Posts Shared With You</h2>
+    <div class="news-container">
+      <div class="news-post">
+        <!-- Placeholder for inbound shared posts -->
+        <p>No shared results yet. When someone shares with you, they'll appear here!</p>
+      </div>
+    </div>
+  </section>
+{% endblock %}

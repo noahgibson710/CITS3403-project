@@ -197,6 +197,12 @@ def update_profile_info():
     db.session.commit()
     return redirect(url_for('profile', updated='1'))
 
+@app.route("/news")
+@login_required  # optional: restrict access to logged-in users
+def news():
+    return render_template("news.html")
+
+
 # Run the server
 if __name__ == "__app__":
     app.run(debug=True)
