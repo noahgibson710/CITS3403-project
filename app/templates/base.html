@@ -5,6 +5,7 @@
   <title>Health Macro Calculator - Home</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="./static/css/style.css" />
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/web_favicon.png') }}">
   <script src="{{ url_for('static', filename='js/darkmode.js') }}" defer></script>
 </head>
 
@@ -15,13 +16,11 @@
     <nav>
       <ul>
         <li><a href="{{ url_for('home') }}">Home</a></li>
-        {% if "user" in session %}
+        {% if current_user.is_authenticated %}
           <li><a href="{{ url_for('logout') }}">Logout</a></li>
-        {% endif %}
-        {% if "user" not in session %}
-          <li><a href="{{ url_for('login') }}">Login</a></li>
-        {% else %}
           <li><a href="{{ url_for('profile') }}">Profile</a></li>
+        {% else %}
+          <li><a href="{{ url_for('login') }}">Login</a></li>
         {% endif %}
         <li><a href="{{ url_for('calculator') }}">Macro Calc</a></li>
         <li><a href="{{ url_for('results') }}">Results</a></li>

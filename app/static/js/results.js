@@ -74,10 +74,6 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     }
   } else {
-    // Only show the message if there is no macro history on the page
-    if (!document.querySelector('.macro-history')) {
-      container.innerHTML = "<p style='color:#ff6b6b;'>❌ No results found. Please calculate your macros first on the <a href='/calculator' style='color:#6bffff; text-decoration:underline;'>Macro Calc</a> page.</p>";
-    }
     // Hide the save button if there's nothing to save
     if (saveWrapper) saveWrapper.style.display = "none";
   }
