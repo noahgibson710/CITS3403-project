@@ -9,9 +9,40 @@
     </header>
 
     <section class="profile-info">
-        <div style="text-align:center; margin-bottom: 1em;">
+        <div style="display:flex; flex-direction:column; align-items:center; margin-bottom: 2em;">
             <h2 style="font-size:2rem; font-weight:bold; color:#ff6b6b; margin-bottom:0.5em;">{{ user.name }}</h2>
-            <img src="{{ url_for('static', filename='images/placeholder-profile.jpg') }}" alt="Profile Picture" class="profile-picture" style="display:block; margin:0 auto 1em auto; border:3px solid #ff6b6b; border-radius:50%; width:120px; height:120px;">
+            <div class="profile-card">
+                <img src="{{ url_for('static', filename='profile_pics/' + user.profile_picture) }}" alt="Profile Picture" class="profile-picture">
+                <button onclick="document.getElementById('profile-picture-form').style.display='block'" class="profile-btn update-btn">Update Profile Picture</button>
+            </div>
+            <!-- Profile Picture Upload Form -->
+            <div id="profile-picture-form" style="display:none; margin-top: 1em; background:#181818; padding:2em; border-radius:16px; box-shadow:0 0 10px #ff6b6b33; max-width:400px; margin-left:auto; margin-right:auto;">
+                <form method="POST" action="{{ url_for('update_profile_picture') }}" enctype="multipart/form-data">
+                    {{ form.hidden_tag() }}
+                    <fieldset class="form-group">
+                        <legend class="border-bottom mb-4" style="color:#ff6b6b;">Update Profile Picture</legend>
+                        <div class="form-group">
+                            <!-- Remove or change the label below -->
+                            <!-- {{ form.picture.label(style="color:#ff6b6b;") }} -->
+                            {{ form.picture(class="form-control-file", style="color:#ffb3b3;") }}
+                            {% if form.picture.errors %}
+                                {% for error in form.picture.errors %}
+                                    <span class="text-danger">{{ error }}</span></br>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                    </fieldset>
+                    <div class="form-group" style="display:flex; gap:1em; justify-content:center; flex-wrap:wrap;">
+                        {{ form.submit(class="btn btn-outline-info") }}
+                        {% if user.profile_picture != 'placeholder-profile.jpg' %}
+                        <form method="POST" action="{{ url_for('delete_profile_picture') }}">
+                            <button type="submit" class="btn btn-outline-danger">Delete Picture</button>
+                        </form>
+                        {% endif %}
+                        <button type="button" onclick="document.getElementById('profile-picture-form').style.display='none'" class="btn btn-outline-danger">Cancel</button>
+                    </div>
+                </form>
+            </div>
         </div>
         <div style="display:flex; justify-content:center; gap:1em; margin-bottom:1em;">
             <div style="background:#222; color:#ffb3b3; padding:0.5em 1em; border-radius:8px; font-weight:bold;">Username: <span style="color:#ff6b6b;">{{ user.name }}</span></div>
@@ -89,6 +120,70 @@
     }, 2500);
 </script>
 {% endif %}
+
+<style>
+.profile-card {
+    background: #181818;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2em 2em 2em 2em;
+    border-radius: 24px;
+    box-shadow: 0 2px 16px #ff6b6b22;
+    margin-bottom: 2em;
+    width: 340px;
+    max-width: 90vw;
+}
+.profile-picture {
+    display: block;
+    margin: 0 auto 1.2em auto;
+    border: 3px solid #ff6b6b;
+    border-radius: 50%;
+    width: 120px;
+    height: 120px;
+    box-shadow: 0 2px 8px #0005;
+}
+.profile-btn {
+    font-weight: bold;
+    border-radius: 8px;
+    width: 220px;
+    padding: 0.7em 0;
+    margin-bottom: 1em;
+    box-shadow: 0 2px 8px #ff6b6b33;
+    transition: background 0.2s, color 0.2s;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+}
+.update-btn {
+    background: #ff6b6b;
+    color: #fff;
+}
+.update-btn:hover {
+    background: #ffb3b3;
+    color: #222;
+}
+.delete-btn {
+    background: #2d1111;
+    color: #ff6b6b;
+    margin-bottom: 0;
+    margin-top: 0.5em;
+    font-size: 1rem;
+}
+.delete-btn:hover {
+    background: #ff6b6b;
+    color: #fff;
+}
+.profile-card form {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    background: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    margin-bottom: 0 !important;
+}
+</style>
 
 {% endblock %}
 

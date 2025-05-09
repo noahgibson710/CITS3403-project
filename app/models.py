@@ -10,6 +10,7 @@ class User(db.Model, UserMixin):
     password = db.Column(db.String(120), nullable=False)
     gender = db.Column(db.String(10))
     age = db.Column(db.Integer)
+    profile_picture = db.Column(db.String(255), default='placeholder-profile.jpg')
 
 
 class MacroPost(db.Model):
@@ -35,3 +36,14 @@ class FeedPost(db.Model):
     macro_post_id = db.Column(db.Integer, db.ForeignKey('macro_post.id'), nullable=False)
     user = db.relationship('User', backref='feed_posts')
     macro_post = db.relationship('MacroPost', backref='feed_entries')
+
+class SharedPost(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    sender_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    receiver_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    post_id = db.Column(db.Integer, db.ForeignKey('macro_post.id'), nullable=False)
+    timestamp = db.Column(db.DateTime, server_default=db.func.now())
+
+    sender = db.relationship('User', foreign_keys=[sender_id])
+    receiver = db.relationship('User', foreign_keys=[receiver_id])
+    post = db.relationship('MacroPost')
