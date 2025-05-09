@@ -7,6 +7,8 @@ from app.models import User, MacroPost, FeedPost
 from app import db
 from datetime import datetime
 from sqlalchemy.orm import joinedload
+from werkzeug.security import generate_password_hash, check_password_hash
+
 
 
 global logged_in
@@ -21,13 +23,13 @@ def login():
     form = LoginForm()
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
-        if user and user.password == form.password.data:
+        if user and check_password_hash(user.password, form.password.data):
             login_user(user)
-            logged_in = True
             return redirect("/profile")
         else:
             return render_template("login.html", form=form, error="Invalid credentials")
     return render_template("login.html", form=form)
+
 
 
 @app.route("/calculator", methods=["GET", "POST"])
@@ -63,6 +65,7 @@ def profile():
     return render_template("profile.html", user=current_user, macro_posts=macro_posts)
 
 @app.route('/delete_macro_post/<int:post_id>', methods=['POST'])
+@login_required
 def delete_macro_post(post_id):
     post = MacroPost.query.get_or_404(post_id)
     # Delete all feed posts that reference this macro post
@@ -83,12 +86,6 @@ def feed():
                 )
                 .order_by(FeedPost.timestamp.desc())
                 .all())
-    # feed_posts = FeedPost.query.order_by(FeedPost.timestamp.desc()).all()
-    # posts = MacroPost.query.order_by(MacroPost.timestamp.desc()).all()
-    
-    # Get user's macro posts for the dropdown
-    # user_macros = MacroPost.query.filter_by(user_id=current_user.id).order_by(MacroPost.timestamp.desc()).all()
-    
     return render_template("community.html",  posts=posts)
 
 @login_required
@@ -120,14 +117,29 @@ def about():
 @app.route("/signup", methods=["POST", "GET"])
 def signup():
     form = SignupForm()
-    if form.validate_on_submit():
-        print("Received: ", form.name.data, form.email.data, form.password.data)
-        user = User(name=form.name.data, email=form.email.data, password=form.password.data)
-        db.session.add(user)
-        db.session.commit()
-        return redirect("/login")
-    else:
-        return render_template('signup.html', form=form)
+    if request.method == "POST":
+        if form.validate_on_submit():
+            try:
+                existing_user = User.query.filter_by(email=form.email.data).first()
+                if existing_user:
+                    return jsonify({"error": "This email is already registered"}), 400
+                
+                existing_name = User.query.filter(db.func.lower(User.name) == form.name.data.lower()).first()
+                if existing_name:
+                    return jsonify({"error": "This name is already taken"}), 400
+
+                hashed_password = generate_password_hash(form.password.data)
+                user = User(name=form.name.data, email=form.email.data, password=hashed_password)
+                db.session.add(user)
+                db.session.commit()
+                return jsonify({"message": "Signup successful"}), 200
+            except Exception as e:
+                db.session.rollback()
+                print("DB error:", str(e))
+                return jsonify({"error": "Server error"}), 500
+
+    return render_template("signup.html", form=form)
+
 
 # Static file serving (CSS, JS, etc.)
 @app.route("/<path:filename>")
@@ -164,21 +176,6 @@ def save_results():
     db.session.add(new_post)
     db.session.commit()
     return jsonify({"message": "Macro results saved successfully"}), 200
-
-# @app.route('/share_to_feed', methods=['POST'])
-# @login_required
-# def share_to_feed():
-#     if request.method == 'POST':
-#         content = request.form['content']
-#         timestamp = datetime.utcnow()
-#         user_id = current_user.id
-
-#         new_post = FeedPost(content=content, timestamp=timestamp, user_id=user_id)
-#         db.session.add(new_post)
-#         db.session.commit()
-
-#         flash("Post shared successfully", 'success')
-#         return redirect(url_for('feed'))
 
 @app.route('/update_profile_info', methods=['POST'])
 @login_required

@@ -74,43 +74,7 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     }
   } else {
-    // Only show the message if there is no macro history on the page
-    if (!document.querySelector('.macro-history')) {
-      container.innerHTML = "<p style='color:#ff6b6b;'>❌ No results found. Please calculate your macros first on the <a href='/calculator' style='color:#6bffff; text-decoration:underline;'>Macro Calc</a> page.</p>";
-    }
     // Hide the save button if there's nothing to save
     if (saveWrapper) saveWrapper.style.display = "none";
   }
-  
-
-  // Plot calorie chart (example data)
-  Highcharts.chart('calorieChart', {
-    chart: {
-      type: 'line'
-    },
-    title: {
-      text: 'Daily Calorie Intake'
-    },
-    xAxis: {
-      type: 'datetime',
-      title: {
-        text: 'Date'
-      }
-    },
-    yAxis: {
-      title: {
-        text: 'Calories'
-      }
-    },
-    series: [{
-      name: 'Calories',
-      data: [
-        [Date.UTC(2025, 3, 18), 2200],
-        [Date.UTC(2025, 3, 19), 2100],
-        [Date.UTC(2025, 3, 20), 2300],
-        [Date.UTC(2025, 3, 21), 1800],
-        [Date.UTC(2025, 3, 22), 2000]
-      ]
-    }]
-  });
 });
