@@ -115,14 +115,28 @@ def about():
 @app.route("/signup", methods=["POST", "GET"])
 def signup():
     form = SignupForm()
-    if form.validate_on_submit():
-        print("Received: ", form.name.data, form.email.data, form.password.data)
-        user = User(name=form.name.data, email=form.email.data, password=form.password.data)
-        db.session.add(user)
-        db.session.commit()
-        return redirect("/login")
-    else:
-        return render_template('signup.html', form=form)
+    if request.method == "POST":
+        if form.validate_on_submit():
+            try:
+                existing_user = User.query.filter_by(email=form.email.data).first()
+                if existing_user:
+                    return jsonify({"error": "This email is already registered"}), 400
+                
+                existing_name = User.query.filter(db.func.lower(User.name) == form.name.data.lower()).first()
+                if existing_name:
+                    return jsonify({"error": "This name is already taken"}), 400
+
+                user = User(name=form.name.data, email=form.email.data, password=form.password.data)
+                db.session.add(user)
+                db.session.commit()
+                return jsonify({"message": "Signup successful"}), 200
+            except Exception as e:
+                db.session.rollback()
+                print("DB error:", str(e))
+                return jsonify({"error": "Server error" }), 500
+
+    return render_template("signup.html", form=form)
+
 
 # Static file serving (CSS, JS, etc.)
 @app.route("/<path:filename>")
