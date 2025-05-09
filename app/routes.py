@@ -3,7 +3,7 @@ from flask_login import login_required, current_user, login_user, logout_user
 from app import app
 from app.forms import SignupForm, LoginForm
 # app = Blueprint("app", __name__)
-from app.models import User, MacroPost, FeedPost
+from app.models import User, MacroPost, FeedPost, SharedPost
 from app import db
 from datetime import datetime
 from sqlalchemy.orm import joinedload
@@ -201,6 +201,74 @@ def update_profile_info():
 @login_required  # optional: restrict access to logged-in users
 def news():
     return render_template("news.html")
+
+@app.route('/search_users', methods=['GET'])
+@login_required
+def search_users():
+    query = request.args.get('q', '')
+    results = []
+    if query:
+        users = User.query.filter(User.name.ilike(f"%{query}%")).all()
+        results = [{'id': user.id, 'name': user.name} for user in users if user.id != current_user.id]
+    return jsonify(results)
+
+@app.route('/my_macroposts')
+@login_required
+def get_my_macroposts():
+    posts = MacroPost.query.filter_by(user_id=current_user.id).order_by(MacroPost.timestamp.desc()).all()
+    return jsonify([
+        {
+            'id': post.id,
+            'age': post.age,
+            'weight': post.weight,
+            'height': post.height,
+            'bmr': post.bmr,
+            'tdee': post.tdee,
+            'timestamp': post.timestamp.strftime('%Y-%m-%d %H:%M')
+        }
+        for post in posts
+    ])
+
+@app.route('/share_post', methods=['POST'])
+@login_required
+def share_post():
+    data = request.get_json()
+    receiver_name = data.get('receiver')
+    post_id = data.get('post_id')
+
+    receiver = User.query.filter_by(name=receiver_name).first()
+    post = MacroPost.query.get(post_id)
+
+    if not receiver or not post or post.user_id != current_user.id:
+        return jsonify({'error': 'Invalid data'}), 400
+
+    shared = SharedPost(sender_id=current_user.id, receiver_id=receiver.id, post_id=post.id)
+    db.session.add(shared)
+    db.session.commit()
+
+    return jsonify({'message': 'Post shared successfully'})
+
+@app.route('/shared_posts')
+@login_required
+def shared_posts():
+    sent = SharedPost.query.filter_by(sender_id=current_user.id).all()
+    received = SharedPost.query.filter_by(receiver_id=current_user.id).all()
+
+    def format_post(sp):
+        return {
+            'id': sp.post.id,
+            'age': sp.post.age,
+            'weight': sp.post.weight,
+            'height': sp.post.height,
+            'tdee': sp.post.tdee,
+            'timestamp': sp.timestamp.strftime('%Y-%m-%d'),
+            'shared_with': sp.receiver.name if sp.sender_id == current_user.id else sp.sender.name
+        }
+
+    return jsonify({
+        'sent': [format_post(p) for p in sent],
+        'received': [format_post(p) for p in received]
+    })
 
 
 # Run the server
