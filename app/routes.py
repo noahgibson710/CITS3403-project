@@ -1,13 +1,16 @@
-from flask import Flask, request, redirect, send_from_directory, jsonify, url_for, Blueprint, render_template, flash
+from flask import Flask, request, redirect, send_from_directory, jsonify, url_for, Blueprint, render_template, flash, current_app
 from flask_login import login_required, current_user, login_user, logout_user
 from app import app
-from app.forms import SignupForm, LoginForm
+from app.forms import SignupForm, LoginForm, ProfilePictureForm
 # app = Blueprint("app", __name__)
 from app.models import User, MacroPost, FeedPost
 from app import db
 from datetime import datetime
 from sqlalchemy.orm import joinedload
 from werkzeug.security import generate_password_hash, check_password_hash
+import os
+from PIL import Image
+import secrets
 
 
 
@@ -62,7 +65,8 @@ def results():
 @login_required
 def profile():
     macro_posts = MacroPost.query.filter_by(user_id=current_user.id).order_by(MacroPost.timestamp.desc()).all()
-    return render_template("profile.html", user=current_user, macro_posts=macro_posts)
+    form = ProfilePictureForm()
+    return render_template("profile.html", user=current_user, macro_posts=macro_posts, form=form)
 
 @app.route('/delete_macro_post/<int:post_id>', methods=['POST'])
 @login_required
@@ -196,6 +200,58 @@ def update_profile_info():
             return redirect(url_for('profile'))
     db.session.commit()
     return redirect(url_for('profile', updated='1'))
+
+def save_picture(form_picture):
+    random_hex = secrets.token_hex(8)
+    _, f_ext = os.path.splitext(form_picture.filename)
+    picture_fn = random_hex + f_ext
+    picture_path = os.path.join(current_app.root_path, 'static/profile_pics', picture_fn)
+    
+    # Create directory if it doesn't exist
+    os.makedirs(os.path.dirname(picture_path), exist_ok=True)
+    
+    # Resize image
+    output_size = (125, 125)
+    i = Image.open(form_picture)
+    i.thumbnail(output_size)
+    i.save(picture_path)
+    
+    return picture_fn
+
+@app.route("/profile/picture", methods=['POST'])
+@login_required
+def update_profile_picture():
+    form = ProfilePictureForm()
+    if form.validate_on_submit():
+        if form.picture.data:
+            picture_file = save_picture(form.picture.data)
+            current_user.profile_picture = picture_file
+            db.session.commit()
+            flash('Your profile picture has been updated!', 'success')
+    else:
+        # Flash form errors if any
+        for field, errors in form.errors.items():
+            for error in errors:
+                flash(f"Error in {getattr(form, field).label.text}: {error}", 'danger')
+    return redirect(url_for('profile'))
+
+@app.route("/profile/picture/delete", methods=['POST'])
+@login_required
+def delete_profile_picture():
+    if current_user.profile_picture != 'placeholder-profile.jpg':
+        picture_path = os.path.join(current_app.root_path, 'static/profile_pics', current_user.profile_picture)
+        # Only delete if file exists and is not the placeholder
+        if os.path.exists(picture_path):
+            try:
+                os.remove(picture_path)
+            except Exception as e:
+                flash('Could not delete the profile picture file.', 'danger')
+        current_user.profile_picture = 'placeholder-profile.jpg'
+        db.session.commit()
+        flash('Profile picture deleted and reverted to default.', 'success')
+    else:
+        flash('No custom profile picture to delete.', 'info')
+    return redirect(url_for('profile'))
 
 # Run the server
 if __name__ == "__app__":
