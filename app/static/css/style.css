@@ -604,5 +604,151 @@ nav ul {
   background-color: #333;
 }
 
+.add-friends-container {
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background-color: #1a1a1a;
+  border-radius: 10px;
+  text-align: center;
+}
 
+.add-friends-container h2 {
+  color: #ff6b6b;
+  margin-bottom: 2rem;
+  font-size: 2rem;
+}
 
+.search-bar {
+  display: grid;
+  grid-template-rows: auto auto;
+  gap: 15px;
+  margin: 0 auto 2rem auto;
+  max-width: 600px;
+}
+
+.search-bar input {
+  width: 100%;
+  padding: 12px 15px;
+  font-size: 1rem;
+  border-radius: 8px;
+  border: 1px solid #333;
+  background-color: #252525;
+  color: #fff;
+  grid-row: 1;
+}
+
+.search-bar button {
+  width: 200px;
+  justify-self: center;
+  background-color: #ff6b6b;
+  color: #000;
+  font-weight: bold;
+  padding: 12px 15px;
+  font-size: 1rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  grid-row: 2;
+}
+
+.search-results {
+  list-style: none;
+  padding: 0;
+  margin: 0 auto;
+  max-width: 500px;
+  text-align: left;
+}
+
+.result-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #252525;
+  border-radius: 8px;
+  padding: 15px 20px;
+  margin-bottom: 15px;
+}
+
+.result-item strong {
+  color: #fff;
+  font-size: 1.1rem;
+}
+
+.result-item form {
+  margin: 0;
+}
+
+.result-item button {
+  background-color: #ff6b6b;
+  color: #000;
+  border: none;
+  border-radius: 5px;
+  padding: 8px 15px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-left: auto;
+}
+
+.result-item button:hover {
+  background-color: #ff4b4b;
+}
+
+.search-results li:only-child {
+  text-align: center;
+  padding: 20px;
+  color: #888;
+}
+
+.username-link,
+.username-link strong {
+  text-decoration: none;
+  color: white;
+  transition: color 0.3s ease;
+}
+
+.username-link:hover,
+.username-link:hover strong {
+  color: #ff6b6b;
+}
+
+.result-item,
+.result-item > *,
+.result-item > * > * {
+  background-color: #252525 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.result-item {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  padding: 15px 20px !important;
+  border-radius: 8px !important;
+  margin-bottom: 15px !important;
+}
+
+.result-item button {
+  background-color: #ff6b6b !important;
+  color: #000 !important;
+  border-radius: 5px !important;
+  padding: 8px 15px !important;
+  font-weight: bold !important;
+  cursor: pointer !important;
+}
+
+input,
+select {
+  color: #fff; 
+}
+
+input[disabled],
+select[disabled],
+select[disabled] option,
+.disabled-field {
+  color: #ffb3b3 !important;
+  opacity: 1 !important;
+}

@@ -45,6 +45,10 @@
     <label for="password">Password:</label>
     {{ form.password(id="password") }}
 
+    <label>
+      <input type="checkbox" id="show-password-checkbox"> Show password
+    </label>
+
     {{ form.submit(id="loginForm") }}
   </form>
 
@@ -56,5 +60,12 @@
 <p class="signup-link">
   Don't have an account? <a href="{{ url_for('signup') }}">Sign up here</a>
 </p>
+
+<script> // Added show password in the login page
+document.getElementById('show-password-checkbox').addEventListener('change', function () {
+   const passwordField = document.getElementById('password');
+   passwordField.type = this.checked ? 'text' : 'password';
+});
+</script>
 
 {% endblock %}
