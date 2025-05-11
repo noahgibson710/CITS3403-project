@@ -32,11 +32,12 @@
         <div class="add-friends-container">
             <h2>My Friends List</h2>
 
-            {% if friends %}
+            {% if current_user.friends %}
                 <ul class="search-results">
-                    {% for friend in friends %}
+                    {% for friend in current_user.friends %}
                         <li>
                             <div class="result-item">
+                                <h3>{{ friend.name}}</h3>
                                 <span><a href="{{ url_for('view_user_profile', user_id=friend.id) }}" class="username-link"><strong>{{ friend.name }}</strong></a></span>
                             </div>
                         </li>
@@ -56,8 +57,8 @@
                         <div class="result-item">
                             <h3>From {{ request.requester.name }}</h3>
                             <form method="POST" action="{{ url_for('respond_friend_request', request_id=request.request_id) }}">
-                                <button type="submit">Accept</button>
-                                <button type="submit">Decline</button>
+                                <button name = "decision" type="submit" value = "accept">Accept</button>
+                                <button name = "decision" type="submit" value="decline">Decline</button>
                             </form>
                         </div>
                     </li>

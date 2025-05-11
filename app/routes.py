@@ -378,22 +378,26 @@ def add_friend(user_id):
         # request = AddFriend(sender_id=current_user.id, receiver_id=receiver.id)
         # db.session.add(request)
         # db.session.commit()
-        # flash("✅ Friend request sent!", "success")
+        # flash("✅ Friend request sent", "success")
     return redirect(url_for('add_friends'))
 
 @app.route('/friend_requests/respond/<int:request_id>', methods=['POST'])
 @login_required
 def respond_friend_request(request_id):
     decision = request.form.get('decision') 
-    request_entry = AddFriend.query.get_or_404(request_id)
-    if request_entry.receiver_id != current_user.id:
-        abort(403)
+    request_entry = FriendRequest.query.filter_by(request_id = request_id, receiver_id=current_user.id).first()
     if decision == 'accept':
         request_entry.status = 'accepted'
+        # Add the sender as a friend
+        sender = request_entry.requester
+        receiver = request_entry.receiver
+        sender.friends.append(receiver)
+        receiver.friends.append(sender)
     elif decision == 'decline':
-        db.session.delete(request_entry)
+        # db.session.delete(request_entry)
+        request_entry.status ='declined'
     db.session.commit()
-    return redirect(url_for('profile'))
+    return redirect(url_for('add_friends'))
 
 @app.route('/profile/<int:user_id>')  #View another user's profile and check if they have accepted the "add friend" request 
 @login_required
