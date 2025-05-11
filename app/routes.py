@@ -276,7 +276,7 @@ def search_users():
     query = request.args.get('q', '')
     results = []
     if query:
-        users = User.query.filter(User.name.ilike(f"%{query}%")).all()
+        users = User.query.filter(User.name.ilike(f"%{query}%"), ~User.friends.any(id=current_user.id)).all()
         results = [{'id': user.id, 'name': user.name} for user in users if user.id != current_user.id]
     return jsonify(results)
 
@@ -338,48 +338,30 @@ def shared_posts():
         'received': [format_post(p) for p in received]
     })
 
-@app.route("/add_friends" ,methods=["GET"])
+@app.route("/friends" ,methods=["GET"])
 @login_required
-def add_friends():
-        
+def friends():
     pending_reqs = (FriendRequest.query.filter_by(receiver_id=current_user.id, status='pending').all())
     friends = []
     
-    return render_template("add_friends.html", friends=friends, pending_requests=pending_reqs)
-
-# @app.route('/add_friends/<int:user_id>', methods=['POST'])
-# @login_required
-# def add_friend(user_id):
-#     receiver = User.query.get_or_404(user_id)
-
-#     already_sent = AddFriend.query.filter_by(sender_id=current_user.id, receiver_id=receiver.id).first()
-#     if already_sent:
-#         flash("Friend request already sent!", "warning")
-#     else:
-#         request = AddFriend(sender_id=current_user.id, receiver_id=receiver.id)
-#         db.session.add(request)
-#         db.session.commit()
-#         flash("✅ Friend request sent!", "success")
-
-#     return redirect(url_for('add_friends'))
+    return render_template("friends.html", friends=friends, pending_requests=pending_reqs)
 
 @app.route('/add_friends/<int:user_id>', methods=['POST'])
 @login_required
 def add_friend(user_id):
     receiver = User.query.get_or_404(user_id)
+    # Check if the user is already a friend
+    if FriendRequest.query.filter_by(requester_id=current_user.id, receiver_id=receiver.id).first():
+        flash("Friend request already sent!")
+        return redirect(url_for('friends'))
+    
     req = FriendRequest(requester=current_user, receiver=receiver, status='pending')
+
     db.session.add(req)
     db.session.commit()
+    flash("✅ Friend request sent", "success")
 
-    # already_sent = AddFriend.query.filter_by(sender_id=current_user.id, receiver_id=receiver.id).first()
-    # if already_sent:
-        # flash("Friend request already sent!", "warning")
-    # else:
-        # request = AddFriend(sender_id=current_user.id, receiver_id=receiver.id)
-        # db.session.add(request)
-        # db.session.commit()
-        # flash("✅ Friend request sent", "success")
-    return redirect(url_for('add_friends'))
+    return redirect(url_for('friends'))
 
 @app.route('/friend_requests/respond/<int:request_id>', methods=['POST'])
 @login_required
@@ -397,7 +379,7 @@ def respond_friend_request(request_id):
         # db.session.delete(request_entry)
         request_entry.status ='declined'
     db.session.commit()
-    return redirect(url_for('add_friends'))
+    return redirect(url_for('friends'))
 
 @app.route('/profile/<int:user_id>')  #View another user's profile and check if they have accepted the "add friend" request 
 @login_required
@@ -415,28 +397,5 @@ def view_user_profile(user_id):
         'profile.html', user=user, macro_posts=macro_posts, form=form, friend_request_sent=bool(already_sent)
     )
 
-# @app.route('/friend_requests/respond/<int:request_id>', methods=['POST'])
-# @login_required
-# def respond_friend_request(request_id):
-#     decision = request.form.get('decision') 
-#     request_entry = AddFriend.query.get_or_404(request_id)
-#     if request_entry.receiver_id != current_user.id:
-#         abort(403)
-#     if decision == 'accept':
-#         request_entry.status = 'accepted'
-#     elif decision == 'decline':
-#         db.session.delete(request_entry)
-#     db.session.commit()
-#     return redirect(url_for('profile'))
-
-# @app.route('/friends')  #Friends list 
-# @login_required
-# def friends():
-#     sent = AddFriend.query.filter_by(sender_id=current_user.id, status='accepted').all()
-#     received = AddFriend.query.filter_by(receiver_id=current_user.id, status='accepted').all()
-#     friends = [User.query.get(req.receiver_id) for req in sent] + [User.query.get(req.sender_id) for req in received]
-#     return render_template('friend_list.html', friends=friends)
-
-# Run the server
 if __name__ == "__app__":
     app.run(debug=True)
