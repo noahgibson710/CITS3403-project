@@ -7,14 +7,14 @@
     <header class="profile-header">
         <h1>Profile Page</h1>
         
-        {% if current_user.id == user.id and incoming_requests %}
+        {% if pending_requests %}
         <div style="margin: 1.5em auto; max-width: 600px;">
-            <h3 style="color:#ff6b6b; margin-bottom: 1em;">You have {{ incoming_requests|length }} pending friend request(s):
+            <h3 style="color:#ff6b6b; margin-bottom: 1em;">You have pending friend request(s):
             </h3>
-            {% for name, request_id in incoming_requests %}
-            <form action="{{ url_for('respond_friend_request', request_id=request_id) }}" method="POST"
+            {% for request in pending_requests %}
+            <form action="{{ url_for('respond_friend_request', request_id=request.request_id) }}" method="POST"
                 style="display:flex; justify-content:space-between; align-items:center; background:#222; padding:0.8em 1em; border-radius:8px; margin-bottom:10px;">
-                <span style="color:#ffb3b3;"> {{ name }}</span>
+                <span style="color:#ffb3b3;"> {{ request.requester.name }}</span>
                 <div>
                     <button name="decision" value="accept" class="profile-btn update-btn" style="margin-right:0.5em; width:90px;">Accept</button>
                     <button name="decision" value="decline" class="delete-btn" style="width:90px;">Decline</button>

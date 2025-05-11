@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Add Friends{% endblock %}
+{% block title %}Friends{% endblock %}
 
 {% block content %}
 <div class="add-friends-container">
@@ -29,11 +29,45 @@
         <button onclick="searchUsers()">Search</button>
     </div>
     <ul id="searchResults" class="search-results"></ul>
-    <div style="text-align:center; margin-top: 1.5rem;">
-         <a href="{{ url_for('friends') }}" style="color: #ff6b6b; font-weight: bold; text-decoration: none;">
-            → View My Friend List
-        </a>
-    </div>
+        <div class="add-friends-container">
+            <h2>My Friends List</h2>
+
+            {% if current_user.friends %}
+                <ul class="search-results">
+                    {% for friend in current_user.friends %}
+                        <li>
+                            <div class="result-item">
+                                <h3>{{ friend.name}}</h3>
+                                <span><a href="{{ url_for('view_user_profile', user_id=friend.id) }}" class="username-link"><strong>View Profile</strong></a></span>
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p style="color: #ccc; text-align: center;">You have no friends yet.</p>
+            {% endif %}
+        </div>
+    
+        <div>
+        <h2>Friend Requests</h2>
+        {% if pending_requests %}
+            <ul class="search-results">
+                {% for request in pending_requests %}
+                    <li>
+                        <div class="result-item">
+                            <h3>From {{ request.requester.name }}</h3>
+                            <form method="POST" action="{{ url_for('respond_friend_request', request_id=request.request_id) }}">
+                                <button name = "decision" type="submit" value = "accept">Accept</button>
+                                <button name = "decision" type="submit" value="decline">Decline</button>
+                            </form>
+                        </div>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p style="color: #ccc; text-align: center;">No new friend requests.</p>
+        {% endif %}
+        </div>
 </div>
 
 </div>
