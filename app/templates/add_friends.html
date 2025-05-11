@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% block title %}Add Friends{% endblock %}
+
+{% block content %}
+<div class="add-friends-container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div style="margin-bottom: 1.5rem;">
+          {% for category, message in messages %}
+            <div style="background: {% if category == 'success' %}#d4edda{% else %}#fff3cd{% endif %};
+                        color: {% if category == 'success' %}#155724{% else %}#856404{% endif %};
+                        border: 1px solid {% if category == 'success' %}#c3e6cb{% else %}#ffeeba{% endif %};
+                        padding: 10px 15px;
+                        border-radius: 6px;
+                        max-width: 600px;
+                        margin: 0 auto 1rem auto;
+                        text-align: center;
+                        box-shadow: 0 2px 6px rgba(0,0,0,0.08);">
+              {{ message }}
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <h2>Find Users</h2>
+    <div class="search-bar">
+        <input id="searchInput" type="text" placeholder="Enter name...">
+        <button onclick="searchUsers()">Search</button>
+    </div>
+    <ul id="searchResults" class="search-results"></ul>
+    <div style="text-align:center; margin-top: 1.5rem;">
+         <a href="{{ url_for('friends') }}" style="color: #ff6b6b; font-weight: bold; text-decoration: none;">
+            → View My Friend List
+        </a>
+    </div>
+</div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function searchUsers() {
+    const query = document.getElementById("searchInput").value;
+    if (!query) return;
+
+    fetch(`/search_users?q=${encodeURIComponent(query)}`)
+        .then(response => response.json())
+        .then(data => {
+            const resultsList = document.getElementById("searchResults");
+            resultsList.innerHTML = '';
+
+            if (data.length === 0) {
+                resultsList.innerHTML = '<li>No users found.</li>';
+                return;
+            }
+
+            data.forEach(user => {
+                const item = document.createElement('li');
+                item.innerHTML = `
+                    <div class="result-item">
+                        <span><a href="/profile/${user.id}" class="username-link"><strong>${user.name}</strong></a></span>
+                        <form method="POST" action="/add_friends/${user.id}">
+                            <button type="submit">Add Friend</button>
+                        </form>
+                    </div>`;
+                resultsList.appendChild(item);
+            });
+        });
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+    document.getElementById("searchInput").addEventListener("keydown", function(event) {
+        if (event.key === "Enter") {
+            event.preventDefault();
+            searchUsers();
+        }
+    });
+});
+</script>
+{% endblock %}
