@@ -17,12 +17,12 @@
       <ul>
         <li><a href="{{ url_for('home') }}">Home</a></li>
         {% if current_user.is_authenticated %}
-          <li><a href="{{ url_for('logout') }}">Logout</a></li>
           <li><a href="{{ url_for('profile') }}">Profile</a></li>
           <li><a href="{{ url_for('add_friends') }}">Add Friends</a></li>
           <li><a href="{{ url_for('news') }}">News</a></li>
         {% else %}
           <li><a href="{{ url_for('login') }}">Login</a></li>
+          <li><a href="{{ url_for('calculator') }}">Macro Calc</a></li>
         {% endif %}
         {% if current_user.is_authenticated and request.endpoint != 'view_user_profile' %}
         <li><a href="{{ url_for('calculator') }}">Macro Calc</a></li>
@@ -30,6 +30,9 @@
         <li><a href="{{ url_for('results') }}">Results</a></li>
         <li><a href="{{ url_for('feed') }}">Community Feed</a></li>
         <li><a href="{{ url_for('about') }}">About Us</a></li>
+        {% if current_user.is_authenticated %}
+          <li><a href="{{ url_for('logout') }}">Logout</a></li>
+        {% endif %}
         
       </ul>
     </nav>    
