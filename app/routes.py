@@ -3,7 +3,7 @@ from flask_login import login_required, current_user, login_user, logout_user
 from app import app
 from app.forms import SignupForm, LoginForm, ProfilePictureForm
 # app = Blueprint("app", __name__)
-from app.models import User, MacroPost, FeedPost, SharedPost, AddFriend, FriendRequest
+from app.models import User, MacroPost, FeedPost, SharedPost, FriendRequest
 from app import db
 from datetime import datetime
 from sqlalchemy.orm import joinedload
@@ -65,31 +65,32 @@ def results():
 @app.route("/profile")
 @login_required
 def profile():
-    pending_count = AddFriend.query.filter_by(receiver_id=current_user.id, status='pending').count()
-    last_count = session.get("last_pending_count", 0)
-    if pending_count != last_count:
-        session["last_pending_count"] = pending_count
-        if pending_count > 0:
-            flash(f"You have {pending_count} pending friend request(s).", "warning")
+    # pending_count = AddFriend.query.filter_by(receiver_id=current_user.id, status='pending').count()
+    # last_count = session.get("last_pending_count", 0)
+    # if pending_count != last_count:
+    #     session["last_pending_count"] = pending_count
+    #     if pending_count > 0:
+    #         flash(f"You have {pending_count} pending friend request(s).", "warning")
 
     macro_posts = MacroPost.query.filter_by(user_id=current_user.id).order_by(MacroPost.timestamp.desc()).all()
     form = ProfilePictureForm()
 
-    raw_requests = AddFriend.query\
-        .filter_by(receiver_id=current_user.id, status='pending')\
-        .join(User, AddFriend.sender_id == User.id)\
-        .add_columns(User.name, AddFriend.id)\
-        .all()
+    # raw_requests = AddFriend.query\
+    #     .filter_by(receiver_id=current_user.id, status='pending')\
+    #     .join(User, AddFriend.sender_id == User.id)\
+    #     .add_columns(User.name, AddFriend.id)\
+    #     .all()
 
-    incoming_requests = [(row[1], row[2]) for row in raw_requests]
+    # incoming_requests = [(row[1], row[2]) for row in raw_requests]
 
+    pending_requests = FriendRequest.query.filter_by(receiver_id=current_user.id, status='pending').all()
 
     return render_template(
         "profile.html",
         user=current_user,
         macro_posts=macro_posts,
         form=form,
-        incoming_requests=incoming_requests
+        pending_requests=pending_requests,
     )
 
 

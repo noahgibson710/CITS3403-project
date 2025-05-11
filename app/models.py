@@ -3,16 +3,6 @@ from datetime import datetime
 from flask_login import UserMixin
 
 
-# class User(db.Model, UserMixin):
-#     id = db.Column(db.Integer, primary_key=True)
-#     name = db.Column(db.String(80), unique=True, nullable=False)
-#     email = db.Column(db.String(120), unique=True, nullable=False)
-#     password = db.Column(db.String(120), nullable=False)
-#     gender = db.Column(db.String(10))
-#     age = db.Column(db.Integer)
-#     profile_picture = db.Column(db.String(255), default='placeholder-profile.jpg')
-
-
 friend_assoc = db.Table(
     'friend_assoc',
     db.Column('user_id',   db.Integer, db.ForeignKey('user.id'), primary_key=True),
@@ -84,13 +74,6 @@ class SharedPost(db.Model):
     sender = db.relationship('User', foreign_keys=[sender_id])
     receiver = db.relationship('User', foreign_keys=[receiver_id])
     post = db.relationship('MacroPost')
-
-class AddFriend(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    sender_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    receiver_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    status = db.Column(db.String(20), default='pending')
-
 
 class FriendRequest(db.Model):
     __tablename__ = 'friend_request'
