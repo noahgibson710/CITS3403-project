@@ -6,16 +6,56 @@
 <div class="profile-container">
     <header class="profile-header">
         <h1>Profile Page</h1>
+        
+        {% if pending_requests %}
+        <div style="margin: 1.5em auto; max-width: 600px;">
+            <h3 style="color:#ff6b6b; margin-bottom: 1em;">You have pending friend request(s):
+            </h3>
+            {% for request in pending_requests %}
+            <form action="{{ url_for('respond_friend_request', request_id=request.request_id) }}" method="POST"
+                style="display:flex; justify-content:space-between; align-items:center; background:#222; padding:0.8em 1em; border-radius:8px; margin-bottom:10px;">
+                <span style="color:#ffb3b3;"> {{ request.requester.name }}</span>
+                <div>
+                    <button name="decision" value="accept" class="profile-btn update-btn" style="margin-right:0.5em; width:90px;">Accept</button>
+                    <button name="decision" value="decline" class="delete-btn" style="width:90px;">Decline</button>
+                </div>
+            </form>
+            {% endfor %}
+        </div>
+        {% endif %}
+
     </header>
+    {% if current_user.id != user.id %}
+       <div style="background: #222; color: #ffb3b3; padding: 1em 1.5em; margin: 1.5em auto; max-width: 600px; border-radius: 12px; text-align: center; box-shadow: 0 0 10px #ff6b6b33;">
+       <p>You are viewing another user's profile.</p>
+       <a href="{{ url_for('profile') }}" style="display: inline-block; margin-top: 0.5em; color: #ff6b6b; font-weight: bold; text-decoration: none;">
+        ← Return to Your Profile
+      </a>
+</div>
+    {% endif %}
 
     <section class="profile-info">
         <div style="display:flex; flex-direction:column; align-items:center; margin-bottom: 2em;">
             <h2 style="font-size:2rem; font-weight:bold; color:#ff6b6b; margin-bottom:0.5em;">{{ user.name }}</h2>
+            {% if current_user.id != user.id %}
+                {% if not friend_request_sent %}
+                  <form method="POST" action="{{ url_for('add_friend', user_id=user.id) }}">
+                    <button type="submit" class="profile-btn update-btn" style="margin-top: 10px;">Add Friend</button>
+                  </form>
+                {% else %}
+                    <div style="color:#aaa; margin-top:10px;">Friend request already sent.</div>
+                {% endif %}
+            {% endif %}
+
             <div class="profile-card">
                 <img src="{{ url_for('static', filename='profile_pics/' + user.profile_picture) }}" alt="Profile Picture" class="profile-picture">
-                <button onclick="document.getElementById('profile-picture-form').style.display='block'" class="profile-btn update-btn">Update Profile Picture</button>
+            {% if current_user.id == user.id %}
+               <button onclick="document.getElementById('profile-picture-form').style.display='block'" class="profile-btn update-btn">Update Profile Picture</button>
+            {% endif %}
+
             </div>
             <!-- Profile Picture Upload Form -->
+            {% if current_user.id == user.id %}
             <div id="profile-picture-form" style="display:none; margin-top: 1em; background:#181818; padding:2em; border-radius:16px; box-shadow:0 0 10px #ff6b6b33; max-width:400px; margin-left:auto; margin-right:auto;">
                 <form method="POST" action="{{ url_for('update_profile_picture') }}" enctype="multipart/form-data">
                     {{ form.hidden_tag() }}
@@ -31,6 +71,7 @@
                                 {% endfor %}
                             {% endif %}
                         </div>
+                        {% endif %}
                     </fieldset>
                     <div class="form-group" style="display:flex; gap:1em; justify-content:center; flex-wrap:wrap;">
                         {{ form.submit(class="btn btn-outline-info") }}
@@ -39,7 +80,6 @@
                             <button type="submit" class="btn btn-outline-danger">Delete Picture</button>
                         </form>
                         {% endif %}
-                        <button type="button" onclick="document.getElementById('profile-picture-form').style.display='none'" class="btn btn-outline-danger">Cancel</button>
                     </div>
                 </form>
             </div>
@@ -50,15 +90,22 @@
         </div>
         <form action="{{ url_for('update_profile_info') }}" method="POST" style="margin-top: 1em; background:#181818; padding:2em; border-radius:16px; box-shadow:0 0 10px #ff6b6b33; max-width:400px; margin-left:auto; margin-right:auto;">
             <label for="gender" style="color:#ff6b6b; font-weight:bold;">Gender:</label>
-            <select id="gender" name="gender" required style="width:100%; margin-bottom:1em; padding:0.5em; font-size:1rem; box-sizing:border-box;">
-                <option value="" disabled {% if not user.gender %}selected{% endif %}>Select your gender</option>
+            <select id="gender" name="gender" required style="width:100%; margin-bottom:1em; padding:0.5em; font-size:1rem; box-sizing:border-box;" {% if current_user.id != user.id %}disabled{% endif %}>
+                <option disabled {% if not user.gender %}selected{% endif %}>
+                    {{ user.gender if user.gender else "Not specified by user" }}
+                </option>
                 <option value="male" {% if user.gender == 'male' %}selected{% endif %}>Male</option>
                 <option value="female" {% if user.gender == 'female' %}selected{% endif %}>Female</option>
-            </select>
-            <label for="age" style="color:#ff6b6b; font-weight:bold;">Age (21–70):</label>
-            <input type="number" id="age" name="age" min="21" max="70" value="{{ user.age if user.age else '' }}" required style="width:100%; margin-bottom:1em; padding:0.5em; font-size:1rem; box-sizing:border-box;">
-            <button type="submit" style="margin-top: 1em; background-color: #4CAF50; color: white; font-weight: bold; padding: 8px 16px; border: none; border-radius: 8px; cursor: pointer; width:100%; font-size:1.1rem;">Save Gender & Age</button>
+             </select>
+
+             <label for="age" style="color:#ff6b6b; font-weight:bold;">Age (21–70):</label>
+             <input type="text" id="age" name="age" value="{{ user.age if user.age else '' }}" placeholder="Not specified by user" {% if current_user.id != user.id %}disabled class="disabled-field"{% endif %}>
+
+            {% if current_user.id == user.id %}
+               <button type="submit" style="margin-top: 1em; background-color: #4CAF50; color: white; font-weight: bold; padding: 8px 16px; border: none; border-radius: 8px; cursor: pointer; width:100%; font-size:1.1rem;">Save Gender & Age</button>
+            {% endif %}
         </form>
+
     </section>
     
 
@@ -182,6 +229,13 @@
     box-shadow: none !important;
     padding: 0 !important;
     margin-bottom: 0 !important;
+}
+
+input[disabled],
+select[disabled],
+select[disabled] option {
+  color: #ffb3b3 !important;
+  opacity: 1 !important;
 }
 </style>
 

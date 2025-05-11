@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <title>Health Macro Calculator - Home</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="stylesheet" href="./static/css/style.css" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
   <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/web_favicon.png') }}">
   <script src="{{ url_for('static', filename='js/darkmode.js') }}" defer></script>
 </head>
@@ -17,15 +17,22 @@
       <ul>
         <li><a href="{{ url_for('home') }}">Home</a></li>
         {% if current_user.is_authenticated %}
-          <li><a href="{{ url_for('logout') }}">Logout</a></li>
           <li><a href="{{ url_for('profile') }}">Profile</a></li>
+          <li><a href="{{ url_for('friends') }}">Add Friends</a></li>
+          <li><a href="{{ url_for('news') }}">News</a></li>
         {% else %}
           <li><a href="{{ url_for('login') }}">Login</a></li>
+          <li><a href="{{ url_for('calculator') }}">Macro Calc</a></li>
         {% endif %}
+        {% if current_user.is_authenticated and request.endpoint != 'view_user_profile' %}
         <li><a href="{{ url_for('calculator') }}">Macro Calc</a></li>
+        {% endif %}
         <li><a href="{{ url_for('results') }}">Results</a></li>
         <li><a href="{{ url_for('feed') }}">Community Feed</a></li>
         <li><a href="{{ url_for('about') }}">About Us</a></li>
+        {% if current_user.is_authenticated %}
+          <li><a href="{{ url_for('logout') }}">Logout</a></li>
+        {% endif %}
         
       </ul>
     </nav>    
