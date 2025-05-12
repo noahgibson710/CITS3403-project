@@ -107,16 +107,25 @@ def delete_macro_post(post_id):
 @app.route("/feed", methods=["GET"])
 @login_required
 def feed():    
-    # Get all feed posts
-
     posts = (FeedPost.query
                 .options(
-                  joinedload(FeedPost.user),
-                  joinedload(FeedPost.macro_post)
+                    joinedload(FeedPost.user),
+                    joinedload(FeedPost.macro_post)
                 )
                 .order_by(FeedPost.timestamp.desc())
                 .all())
-    return render_template("community.html",  posts=posts)
+    
+    # Fetch the macro history for each post and attach it
+    for post in posts:
+        # Fetch the macro history for this user's posts, ordered by timestamp
+        macro_history = (MacroPost.query
+                         .filter_by(user_id=post.user.id)
+                         .order_by(MacroPost.timestamp.asc())
+                         .all())
+        post.macro_history = macro_history  # Attach it to the post object
+    
+    return render_template("community.html", posts=posts)
+
 
 @login_required
 @app.route("/create_feed_post/<int:post_id>", methods=["POST"])
@@ -196,11 +205,13 @@ def save_results():
         height=data['height'],
         bmr=data['bmr'],
         tdee=data['tdee'],
+        calorie_goal=data['calorie_goal'],
         user_id=current_user.id
     )
     db.session.add(new_post)
     db.session.commit()
     return jsonify({"message": "Macro results saved successfully"}), 200
+
 
 @app.route('/update_profile_info', methods=['POST'])
 @login_required
