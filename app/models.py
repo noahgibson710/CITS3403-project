@@ -48,11 +48,13 @@ class MacroPost(db.Model):
     height = db.Column(db.Float, nullable=False)
     bmr = db.Column(db.Float, nullable=False)
     tdee = db.Column(db.Float, nullable=False)
+    calorie_goal = db.Column(db.String(10), nullable=False, server_default='maintain')
     timestamp = db.Column(db.DateTime, server_default=db.func.now())
 
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
     user = db.relationship('User', backref=db.backref('macroposts', lazy=True))
+
 
 
 class FeedPost(db.Model):

@@ -11,6 +11,7 @@ document.addEventListener("DOMContentLoaded", () => {
       <p><strong>Height:</strong> ${data.height} cm</p>
       <p><strong>BMR:</strong> ${data.bmr} calories/day</p>
       <p><strong>TDEE:</strong> ${data.tdee} calories/day</p>
+      <p><strong>Calorie Goal:</strong> ${capitalizeGoal(data.calorieGoal)}</p> <!-- Add Calorie Goal here -->
       <div style="text-align:center; margin-top: 30px;">
         <a href="/calculator">
           <button style="background-color: #ff6b6b; color: #000; font-weight: bold; padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer;">
@@ -40,7 +41,16 @@ document.addEventListener("DOMContentLoaded", () => {
           headers: {
             'Content-Type': 'application/json'
           },
-          body: JSON.stringify(data)
+          body: JSON.stringify({
+            gender: data.gender,
+            age: data.age,
+            weight: data.weight,
+            height: data.height,
+            bmr: data.bmr,
+            tdee: data.tdee,
+            calorie_goal: data.calorieGoal
+          })
+          
         })
         .then(response => response.json())
         .then(response => {
@@ -78,3 +88,14 @@ document.addEventListener("DOMContentLoaded", () => {
     if (saveWrapper) saveWrapper.style.display = "none";
   }
 });
+
+// Helper function to capitalize the calorie goal
+function capitalizeGoal(goal) {
+  if (goal === "deficit") {
+    return "Calorie Deficit";
+  } else if (goal === "surplus") {
+    return "Calorie Surplus";
+  } else {
+    return "Maintenance";
+  }
+}
