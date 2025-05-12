@@ -5,7 +5,7 @@ from app.forms import SignupForm, LoginForm, ProfilePictureForm
 # app = Blueprint("app", __name__)
 from app.models import User, MacroPost, FeedPost, SharedPost, FriendRequest
 from app import db
-from datetime import datetime
+from datetime import datetime, timezone
 from sqlalchemy.orm import joinedload
 from werkzeug.security import generate_password_hash, check_password_hash
 import os
@@ -117,12 +117,16 @@ def feed():
     
     # Fetch the macro history for each post and attach it
     for post in posts:
-        # Fetch the macro history for this user's posts, ordered by timestamp
-        macro_history = (MacroPost.query
-                         .filter_by(user_id=post.user.id)
-                         .order_by(MacroPost.timestamp.asc())
-                         .all())
-        post.macro_history = macro_history  # Attach it to the post object
+        all_history = (MacroPost.query
+            .filter(MacroPost.user_id == post.user.id)
+            .order_by(MacroPost.timestamp.asc())
+            .all())
+        idx = next((i for i, m in enumerate(all_history) if m.id == post.macro_post.id), None)
+        if idx is not None:
+            macro_history = all_history[:idx+1]
+        else:
+            macro_history = all_history
+        post.macro_history = macro_history
     
     return render_template("community.html", posts=posts)
 
@@ -408,6 +412,9 @@ def view_user_profile(user_id):
     return render_template(
         'profile.html', user=user, macro_posts=macro_posts, form=form, friend_request_sent=bool(already_sent)
     )
+
+def strip_tz(dt):
+    return dt.replace(tzinfo=None) if dt and hasattr(dt, 'tzinfo') and dt.tzinfo else dt
 
 if __name__ == "__app__":
     app.run(debug=True)
