@@ -63,6 +63,7 @@ class FeedPost(db.Model):
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     macro_post_id = db.Column(db.Integer, db.ForeignKey('macro_post.id'), nullable=False)
+    visibility = db.Column(db.String(20), nullable=False, server_default='public')  # 'public', 'friends', 'private'
     user = db.relationship('User', backref='feed_posts')
     macro_post = db.relationship('MacroPost', backref='feed_entries')
 
@@ -93,7 +94,7 @@ class FriendRequest(db.Model):
         nullable=False,
         default='pending'
     )
-    # “Which side is which” helper relationships:
+    # "Which side is which" helper relationships:
     requester = db.relationship(
         'User',
         foreign_keys=[requester_id],

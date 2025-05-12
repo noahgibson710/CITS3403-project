@@ -13,6 +13,12 @@
               <h3>{{ post.user.name }}</h3>
               <span class="post-date">{{ post.timestamp.strftime('%Y-%m-%d %H:%M') }}</span>
             </div>
+            <div class="visibility-badge 
+                {% if post.visibility == 'public' %}visibility-public{% endif %}
+                {% if post.visibility == 'friends' %}visibility-friends{% endif %}
+                {% if post.visibility == 'private' %}visibility-private{% endif %}">
+                {{ post.visibility }}
+            </div>
             <p>Macro history count: {{ post.macro_history|length }}</p>
             <div id="macro-history-graph-{{ post.id }}"></div>
             <script>
@@ -160,6 +166,31 @@ textarea, select {
 
 .macro-results li {
   margin-bottom: 5px;
+}
+
+.visibility-badge {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.8em;
+  font-weight: bold;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+}
+
+.visibility-public {
+  background-color: #28a745;
+  color: white;
+}
+
+.visibility-friends {
+  background-color: #fd7e14;
+  color: white;
+}
+
+.visibility-private {
+  background-color: #dc3545;
+  color: white;
 }
 </style> 
 
