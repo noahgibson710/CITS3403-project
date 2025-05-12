@@ -61,9 +61,7 @@
                     {{ form.hidden_tag() }}
                     <fieldset class="form-group">
                         <legend class="border-bottom mb-4" style="color:#ff6b6b;">Update Profile Picture</legend>
-                        <div class="form-group">
-                            <!-- Remove or change the label below -->
-                            <!-- {{ form.picture.label(style="color:#ff6b6b;") }} -->
+                        <div class="input-wrapper">
                             {{ form.picture(class="form-control-file", style="color:#ffb3b3;") }}
                             {% if form.picture.errors %}
                                 {% for error in form.picture.errors %}
@@ -71,7 +69,6 @@
                                 {% endfor %}
                             {% endif %}
                         </div>
-                        {% endif %}
                     </fieldset>
                     <div class="form-group" style="display:flex; gap:1em; justify-content:center; flex-wrap:wrap;">
                         {{ form.submit(class="btn btn-outline-info") }}
@@ -83,6 +80,7 @@
                     </div>
                 </form>
             </div>
+            {% endif %}
         </div>
         <div style="display:flex; justify-content:center; gap:1em; margin-bottom:1em;">
             <div style="background:#222; color:#ffb3b3; padding:0.5em 1em; border-radius:8px; font-weight:bold;">Username: <span style="color:#ff6b6b;">{{ user.name }}</span></div>
@@ -236,6 +234,73 @@ select[disabled],
 select[disabled] option {
   color: #ffb3b3 !important;
   opacity: 1 !important;
+}
+
+@media (max-width: 600px) {
+    .profile-card,
+    #profile-picture-form,
+    .profile-info > form {
+        padding: 1em;
+        margin-top: 1em !important;
+        margin-bottom: 1em !important;
+        max-width: 98vw;
+    }
+}
+
+#profile-picture-form {
+    margin-top: 1.5em !important;
+    margin-bottom: 2em !important;
+    background: #181818;
+    padding: 2em;
+    border-radius: 16px;
+    box-shadow: 0 0 10px #ff6b6b33;
+    max-width: 400px;
+    margin-left: auto;
+    margin-right: auto;
+    z-index: 2;
+    position: relative;
+}
+
+.profile-info > form {
+    margin-top: 2em !important;
+    margin-bottom: 2em !important;
+    z-index: 1;
+    position: relative;
+}
+
+#profile-picture-form fieldset {
+    border: none;
+    padding: 0;
+    margin: 0;
+}
+
+#profile-picture-form legend {
+    color: #ff6b6b;
+    font-weight: bold;
+    font-size: 1.1em;
+    margin-bottom: 1em;
+    border: none;
+    padding: 0;
+}
+
+#profile-picture-form .input-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    max-width: 320px;
+    margin: 0 auto 0 auto;
+}
+#profile-picture-form .input-wrapper input[type="file"],
+#profile-picture-form .input-wrapper button,
+#profile-picture-form .input-wrapper input[type='submit'] {
+    width: 100%;
+    box-sizing: border-box;
+    margin-bottom: 1.2em;
+    max-width: 100%;
+}
+#profile-picture-form .input-wrapper input[type="file"] {
+    margin-bottom: 2em;
 }
 </style>
 
