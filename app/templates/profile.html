@@ -128,15 +128,26 @@
                         <form action="{{ url_for('delete_macro_post', post_id=post.id) }}" method="POST" style="inline">
                             <button type="submit" onclick="return confirm('Are you sure you want to delete this entry?');">Delete</button>
                         </form>
-                        <form action="{{ url_for('create_feed_post', post_id = post.id) }}" method="POST" style="inline">
+                        <form action="{{ url_for('create_feed_post', post_id=post.id) }}" method="POST" style="inline">
                             {% if macro_posts %}
                                 <input type="hidden" name="content" value="Latest Macro Stats - Weight: {{ macro_posts[-1].weight }}kg, BMR: {{ macro_posts[-1].bmr }}, TDEE: {{ macro_posts[-1].tdee }}">
                             {% else %}
                                 <input type="hidden" name="content" value="No macro stats available.">
                             {% endif %}
-                                    <button type="submit">Share to Community Feed</button>
+                            <div style="margin-top: 8px; display: flex; align-items: center;">
+                                <select name="visibility" style="margin-right: 8px; padding: 4px;">
+                                    <option value="public">Public (Everyone)</option>
+                                    <option value="friends">Friends Only</option>
+                                    <option value="private">Private (Only Me)</option>
+                                </select>
+                                <button type="submit">Share to Community Feed</button>
+                            </div>
                         </form>
                         
+                        <!-- Share with specific friends button -->
+                        <button onclick="openShareModal('{{ post.id }}')" class="share-btn" style="margin-top: 8px;">
+                            Direct Share with Friends
+                        </button>
                     </li>
                 {% endfor %}
             </ul>
@@ -144,6 +155,18 @@
             <p>You haven't saved any results yet.</p>
         {% endif %}
     </section>
+</div>
+
+<!-- Share with Friends Modal -->
+<div id="shareModal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeShareModal()">&times;</span>
+        <h3>Share with Friends</h3>
+        <div id="friendsList">
+            <!-- Friend list will be populated by JavaScript -->
+            <p>Loading friends...</p>
+        </div>
+    </div>
 </div>
 
 <div class="theme-toggle">
@@ -302,6 +325,64 @@ select[disabled] option {
 #profile-picture-form .input-wrapper input[type="file"] {
     margin-bottom: 2em;
 }
+
+.share-btn {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.7);
+    z-index: 1000;
+}
+
+.modal-content {
+    background-color: #181818;
+    margin: 15% auto;
+    padding: 20px;
+    border-radius: 10px;
+    width: 50%;
+    max-width: 500px;
+    position: relative;
+    color: #ffb3b3;
+}
+
+.close-btn {
+    color: #ff6b6b;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.friend-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    margin: 5px 0;
+    background-color: #222;
+    border-radius: 5px;
+}
+
+.share-friend-btn {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+}
 </style>
 
 {% endblock %}
@@ -350,4 +431,81 @@ select[disabled] option {
     });
 </script>
 
+<script>
+let currentPostId = null;
+
+function openShareModal(postId) {
+    currentPostId = postId;
+    document.getElementById('shareModal').style.display = 'block';
+    loadFriends();
+}
+
+function closeShareModal() {
+    document.getElementById('shareModal').style.display = 'none';
+}
+
+function loadFriends() {
+    fetch('/friends/list')
+        .then(response => response.json())
+        .then(data => {
+            const friendsList = document.getElementById('friendsList');
+            friendsList.innerHTML = '';
+            
+            if (data.length === 0) {
+                friendsList.innerHTML = '<p>You have no friends to share with.</p>';
+                return;
+            }
+            
+            data.forEach(friend => {
+                const item = document.createElement('div');
+                item.className = 'friend-item';
+                item.innerHTML = `
+                    <span>${friend.name}</span>
+                    <button onclick="shareWithFriend(${friend.id})" class="share-friend-btn">Share</button>
+                `;
+                friendsList.appendChild(item);
+            });
+        })
+        .catch(error => {
+            console.error('Error loading friends:', error);
+            document.getElementById('friendsList').innerHTML = '<p>Error loading friends.</p>';
+        });
+}
+
+function shareWithFriend(friendId) {
+    if (!currentPostId) return;
+    
+    fetch('/share_post', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            post_id: currentPostId,
+            friend_id: friendId
+        }),
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Shared successfully!');
+            closeShareModal();
+        } else {
+            alert('Error: ' + data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error sharing post:', error);
+        alert('Error sharing post. Please try again.');
+    });
+}
+
+// Close modal if user clicks outside of it
+window.onclick = function(event) {
+    const modal = document.getElementById('shareModal');
+    if (event.target == modal) {
+        closeShareModal();
+    }
+}
+</script>
 {% endblock %}

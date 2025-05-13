@@ -1,0 +1,78 @@
+        {% for post in posts %}
+        <div class="post">
+            <div class="post-header">
+                <div class="user-info">
+                    <img src="{{ post.user.profile_picture }}" alt="Profile Picture" class="profile-picture">
+                    <div>
+                        <h3>{{ post.user.username }}</h3>
+                        <p class="post-date">{{ post.created_at.strftime('%Y-%m-%d %H:%M') }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="post-content">
+                <p>{{ post.content }}</p>
+                {% if post.macro_result %}
+                <div class="macro-result">
+                    <h4>Macro Results</h4>
+                    <div class="macro-details">
+                        <p><strong>Protein:</strong> {{ post.macro_result.protein }}g</p>
+                        <p><strong>Carbs:</strong> {{ post.macro_result.carbs }}g</p>
+                        <p><strong>Fats:</strong> {{ post.macro_result.fats }}g</p>
+                        <p><strong>Calories:</strong> {{ post.macro_result.calories }} kcal</p>
+                    </div>
+                    <div id="macroChart{{ post.id }}" class="macro-chart"></div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <script src="https://code.highcharts.com/highcharts.js?v={{ now }}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Create a single object to store all macro data
+            const allMacroData = {
+                {% for post in posts %}
+                    {% if post.macro_result and post.macro_result.macro_history %}
+                        '{{ post.id }}': {{ post.macro_result.macro_history|tojson|safe }},
+                    {% endif %}
+                {% endfor %}
+            };
+
+            // Create charts for each post that has macro data
+            Object.keys(allMacroData).forEach(postId => {
+                const macroData = allMacroData[postId];
+                Highcharts.chart('macroChart' + postId, {
+                    chart: {
+                        type: 'line',
+                        height: 300
+                    },
+                    title: {
+                        text: 'Macro History'
+                    },
+                    xAxis: {
+                        categories: macroData.map(item => item.date)
+                    },
+                    yAxis: {
+                        title: {
+                            text: 'Grams'
+                        }
+                    },
+                    series: [{
+                        name: 'Protein',
+                        data: macroData.map(item => item.protein)
+                    }, {
+                        name: 'Carbs',
+                        data: macroData.map(item => item.carbs)
+                    }, {
+                        name: 'Fats',
+                        data: macroData.map(item => item.fats)
+                    }],
+                    accessibility: {
+                        enabled: false
+                    }
+                });
+            });
+        });
+    </script> 

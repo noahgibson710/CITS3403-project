@@ -1,11 +1,10 @@
 from flask import Flask, request, redirect, send_from_directory, jsonify, url_for, Blueprint, render_template, flash, current_app, session
 from flask_login import login_required, current_user, login_user, logout_user
-from app import app
+from app import app, db
 from app.forms import SignupForm, LoginForm, ProfilePictureForm
 # app = Blueprint("app", __name__)
 from app.models import User, MacroPost, FeedPost, SharedPost, FriendRequest
-from app import db
-from datetime import datetime
+from datetime import datetime, timezone
 from sqlalchemy.orm import joinedload
 from werkzeug.security import generate_password_hash, check_password_hash
 import os
@@ -107,22 +106,39 @@ def delete_macro_post(post_id):
 @app.route("/feed", methods=["GET"])
 @login_required
 def feed():    
-    posts = (FeedPost.query
-                .options(
-                    joinedload(FeedPost.user),
-                    joinedload(FeedPost.macro_post)
-                )
-                .order_by(FeedPost.timestamp.desc())
-                .all())
+    # Build a query to get posts based on visibility settings:
+    # 1. Public posts from anyone
+    # 2. Friends-only posts from friends
+    # 3. All posts from the current user
+    
+    # Get IDs of current user's friends
+    friend_ids = [friend.id for friend in current_user.friends]
+    
+    posts_query = FeedPost.query.filter(
+        or_(
+            FeedPost.visibility == 'public',  # All public posts
+            (FeedPost.visibility == 'friends') & (FeedPost.user_id.in_(friend_ids)),  # Friends' posts with 'friends' visibility
+            FeedPost.user_id == current_user.id  # All posts by current user
+        )
+    ).options(
+        joinedload(FeedPost.user),
+        joinedload(FeedPost.macro_post)
+    ).order_by(FeedPost.timestamp.desc())
+    
+    posts = posts_query.all()
     
     # Fetch the macro history for each post and attach it
     for post in posts:
-        # Fetch the macro history for this user's posts, ordered by timestamp
-        macro_history = (MacroPost.query
-                         .filter_by(user_id=post.user.id)
-                         .order_by(MacroPost.timestamp.asc())
-                         .all())
-        post.macro_history = macro_history  # Attach it to the post object
+        all_history = (MacroPost.query
+            .filter(MacroPost.user_id == post.user.id)
+            .order_by(MacroPost.timestamp.asc())
+            .all())
+        idx = next((i for i, m in enumerate(all_history) if m.id == post.macro_post.id), None)
+        if idx is not None:
+            macro_history = all_history[:idx+1]
+        else:
+            macro_history = all_history
+        post.macro_history = macro_history
     
     return render_template("community.html", posts=posts)
 
@@ -132,20 +148,25 @@ def feed():
 def create_feed_post(post_id):
     post = MacroPost.query.get_or_404(post_id)
     user_who_shared_id = current_user.id
+    visibility = request.form.get('visibility', 'public')  # Default to public if not specified
 
     # Prevent duplicate posts: check if this macro_post has already been shared by this user
     existing_post = FeedPost.query.filter_by(user_id=user_who_shared_id, macro_post_id=post.id).first()
     if existing_post:
-        flash("You have already shared this result to the community feed.", "warning")
+        # Update visibility if already shared
+        existing_post.visibility = visibility
+        db.session.commit()
+        flash(f"Visibility updated to {visibility} for this shared result.", "success")
         return redirect(url_for("feed"))
 
     new_post = FeedPost(
         user_id=user_who_shared_id,
-        macro_post_id=post.id
+        macro_post_id=post.id,
+        visibility=visibility
     )
     db.session.add(new_post)
     db.session.commit()
-    flash("Result shared to community feed!", "success")
+    flash(f"Result shared to community feed with {visibility} visibility!", "success")
     return redirect(url_for("feed"))
 
 @app.route("/about")
@@ -292,6 +313,17 @@ def search_users():
         results = [{'id': user.id, 'name': user.name} for user in users if user.id != current_user.id]
     return jsonify(results)
 
+@app.route('/friends/list', methods=['GET'])
+@login_required
+def get_friends_list():
+    friends = current_user.friends.all()
+    return jsonify([
+        {
+            'id': friend.id,
+            'name': friend.name
+        } for friend in friends
+    ])
+
 @app.route('/my_macroposts')
 @login_required
 def get_my_macroposts():
@@ -313,20 +345,41 @@ def get_my_macroposts():
 @login_required
 def share_post():
     data = request.get_json()
-    receiver_name = data.get('receiver')
+    friend_id = data.get('friend_id')
     post_id = data.get('post_id')
 
-    receiver = User.query.filter_by(name=receiver_name).first()
+    if not friend_id or not post_id:
+        return jsonify({'success': False, 'message': 'Missing required data'}), 400
+
+    friend = User.query.get(friend_id)
     post = MacroPost.query.get(post_id)
 
-    if not receiver or not post or post.user_id != current_user.id:
-        return jsonify({'error': 'Invalid data'}), 400
+    if not friend or not post:
+        return jsonify({'success': False, 'message': 'Invalid friend or post'}), 400
 
-    shared = SharedPost(sender_id=current_user.id, receiver_id=receiver.id, post_id=post.id)
-    db.session.add(shared)
+    if post.user_id != current_user.id:
+        return jsonify({'success': False, 'message': 'You can only share your own posts'}), 403
+
+    # Check if already shared with this friend
+    existing_share = SharedPost.query.filter_by(
+        sender_id=current_user.id,
+        receiver_id=friend.id,
+        post_id=post.id
+    ).first()
+
+    if existing_share:
+        return jsonify({'success': True, 'message': 'Already shared with this friend'})
+
+    # Create new shared post
+    shared_post = SharedPost(
+        sender_id=current_user.id,
+        receiver_id=friend.id,
+        post_id=post.id
+    )
+    db.session.add(shared_post)
     db.session.commit()
 
-    return jsonify({'message': 'Post shared successfully'})
+    return jsonify({'success': True, 'message': 'Post shared successfully'})
 
 @app.route('/shared_posts')
 @login_required
@@ -408,6 +461,9 @@ def view_user_profile(user_id):
     return render_template(
         'profile.html', user=user, macro_posts=macro_posts, form=form, friend_request_sent=bool(already_sent)
     )
+
+def strip_tz(dt):
+    return dt.replace(tzinfo=None) if dt and hasattr(dt, 'tzinfo') and dt.tzinfo else dt
 
 if __name__ == "__app__":
     app.run(debug=True)

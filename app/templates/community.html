@@ -13,35 +13,42 @@
               <h3>{{ post.user.name }}</h3>
               <span class="post-date">{{ post.timestamp.strftime('%Y-%m-%d %H:%M') }}</span>
             </div>
-            
-            {% if post.macro_history %}
-              <div id="macro-history-graph-{{ loop.index }}"></div>
-              <script>
-                const macroData = {
-                    dates: {{ post.macro_history | map(attribute='timestamp') | map('string') | list | tojson }},
-                    weights: {{ post.macro_history | map(attribute='weight') | list | tojson }},
-                    bmr: {{ post.macro_history | map(attribute='bmr') | list | tojson }},
-                    tdee: {{ post.macro_history | map(attribute='tdee') | list | tojson }},
-                };
+            <div class="visibility-badge 
+                {% if post.visibility == 'public' %}visibility-public{% endif %}
+                {% if post.visibility == 'friends' %}visibility-friends{% endif %}
+                {% if post.visibility == 'private' %}visibility-private{% endif %}">
+                {{ post.visibility }}
+            </div>
+            <p>Macro history count: {{ post.macro_history|length }}</p>
+            <div id="macro-history-graph-{{ post.id }}"></div>
+            <script>
+              const macroData{{ post.id }} = {
+                  dates: {{ post.macro_history | map(attribute='timestamp') | map('string') | list | tojson }},
+                  weights: {{ post.macro_history | map(attribute='weight') | list | tojson }},
+                  bmr: {{ post.macro_history | map(attribute='bmr') | list | tojson }},
+                  tdee: {{ post.macro_history | map(attribute='tdee') | list | tojson }},
+                  calorie_goal: {{ post.macro_history | map(attribute='calorie_goal') | list | tojson }},
+              };
 
-                Highcharts.chart('macro-history-graph-{{ loop.index }}', {
-                    chart: { type: 'line' },
-                    title: { text: 'Macro History for {{ post.user.name }}' },
-                    xAxis: {
-                        categories: macroData.dates,
-                        title: { text: 'Date' }
-                    },
-                    yAxis: { title: { text: 'Values' }},
-                    series: [
-                        { name: 'Weight (kg)', data: macroData.weights },
-                        { name: 'BMR (cal/day)', data: macroData.bmr },
-                        { name: 'TDEE (cal/day)', data: macroData.tdee }
-                    ]
-                });
-              </script> 
-            {% else %}
-              <p>No macro history available for this post.</p>
-            {% endif %}
+              Highcharts.chart('macro-history-graph-{{ post.id }}', {
+                  chart: { type: 'line' },
+                  title: { text: 'Macro History for {{ post.user.name }}' },
+                  xAxis: {
+                      categories: macroData{{ post.id }}.dates,
+                      title: { text: 'Date' }
+                  },
+                  yAxis: { title: { text: 'Values' }},
+                  series: [
+                      { name: 'Weight (kg)', data: macroData{{ post.id }}.weights },
+                      { name: 'BMR (cal/day)', data: macroData{{ post.id }}.bmr },
+                      { name: 'TDEE (cal/day)', data: macroData{{ post.id }}.tdee },
+                      { name: 'Calorie Goal', data: macroData{{ post.id }}.calorie_goal }
+                  ],
+                  accessibility: {
+                      enabled: false
+                  }
+              });
+            </script>
             
             <div class="post-content">              
               <div class="macro-history">
@@ -56,6 +63,7 @@
                   <li>Height: {{ "%.1f"|format(post.macro_post.height) }} cm</li>
                   <li>BMR: {{ "%.2f"|format(post.macro_post.bmr) }} calories</li>
                   <li>TDEE: {{ "%.2f"|format(post.macro_post.tdee) }} calories</li>
+                  <li>Calorie Goal: {{ post.macro_post.calorie_goal }}</li>
                 </ul>
               </div>
             </div>
@@ -158,6 +166,31 @@ textarea, select {
 
 .macro-results li {
   margin-bottom: 5px;
+}
+
+.visibility-badge {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.8em;
+  font-weight: bold;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+}
+
+.visibility-public {
+  background-color: #28a745;
+  color: white;
+}
+
+.visibility-friends {
+  background-color: #fd7e14;
+  color: white;
+}
+
+.visibility-private {
+  background-color: #dc3545;
+  color: white;
 }
 </style> 
 
