@@ -471,7 +471,8 @@ def view_user_profile(user_id):
     macro_posts = MacroPost.query.filter_by(user_id=user.id).order_by(MacroPost.timestamp.desc()).all()
     form = ProfilePictureForm()
 
-    already_sent = AddFriend.query.filter_by(sender_id=current_user.id, receiver_id=user.id).first()
+    # Check if a friend request has already been sent
+    already_sent = FriendRequest.query.filter_by(requester_id=current_user.id, receiver_id=user.id).first()
 
     return render_template(
         'profile.html', user=user, macro_posts=macro_posts, form=form, friend_request_sent=bool(already_sent)
