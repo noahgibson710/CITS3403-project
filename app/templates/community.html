@@ -91,7 +91,6 @@
                       { name: 'Weight (kg)', data: macroData{{ post.id }}.weights },
                       { name: 'BMR (cal/day)', data: macroData{{ post.id }}.bmr },
                       { name: 'TDEE (cal/day)', data: macroData{{ post.id }}.tdee },
-                      { name: 'Calorie Goal', data: macroData{{ post.id }}.calorie_goal }
                   ],
                   accessibility: {
                       enabled: false
@@ -112,7 +111,7 @@
                   <li>Height: {{ "%.1f"|format(post.macro_post.height) }} cm</li>
                   <li>BMR: {{ "%.2f"|format(post.macro_post.bmr) }} calories</li>
                   <li>TDEE: {{ "%.2f"|format(post.macro_post.tdee) }} calories</li>
-                  <li>Calorie Goal: {{ post.macro_post.calorie_goal }}</li>
+                  <li>Calorie Goal: {{ post.macro_post.calorie_goal|capitalize }}</li>
                 </ul>
               </div>
             </div>
@@ -386,7 +385,7 @@ h1, h2 {
             posts.forEach(post => {
               const option = document.createElement('option');
               option.value = post.id;
-              option.textContent = `Age: ${post.age}, Weight: ${post.weight}kg, TDEE: ${post.tdee}`;
+              option.textContent = `Age: ${post.age}, Weight: ${post.weight}kg, TDEE: ${post.tdee}, Calorie Goal: ${post.calorie_goal}`;
               postSelect.appendChild(option);
             });
           }
@@ -420,6 +419,7 @@ h1, h2 {
                 <p><strong>Shared with:</strong> ${post.shared_with}</p>
                 <p><strong>Age:</strong> ${post.age}, <strong>Weight:</strong> ${post.weight}kg, <strong>Height:</strong> ${post.height}cm</p>
                 <p><strong>TDEE:</strong> ${post.tdee} calories</p>
+                <p><strong>Calorie Goal:</strong> ${post.calorie_goal}</p>
                 <p><strong>Shared on:</strong> ${post.timestamp}</p>
               `;
               sentPostsContainer.appendChild(postElement);
@@ -438,6 +438,7 @@ h1, h2 {
                 <p><strong>From:</strong> ${post.shared_with}</p>
                 <p><strong>Age:</strong> ${post.age}, <strong>Weight:</strong> ${post.weight}kg, <strong>Height:</strong> ${post.height}cm</p>
                 <p><strong>TDEE:</strong> ${post.tdee} calories</p>
+                <p><strong>Calorie Goal:</strong> ${post.calorie_goal}</p>
                 <p><strong>Shared on:</strong> ${post.timestamp}</p>
               `;
               receivedPostsContainer.appendChild(postElement);

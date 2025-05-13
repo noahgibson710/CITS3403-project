@@ -419,6 +419,7 @@ def shared_posts():
             'weight': sp.post.weight,
             'height': sp.post.height,
             'tdee': sp.post.tdee,
+            'calorie_goal': sp.post.calorie_goal.capitalize(),
             'timestamp': sp.timestamp.strftime('%Y-%m-%d'),
             'shared_with': sp.receiver.name if sp.sender_id == current_user.id else sp.sender.name
         }
