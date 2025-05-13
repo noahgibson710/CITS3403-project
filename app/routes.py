@@ -364,13 +364,21 @@ def share_post():
         if not post:
             return jsonify({"error": "Post not found"}), 404
         
-        # Find the receiver by name
-        receiver = User.query.filter(User.name == receiver_name).first()
-        if not receiver:
-            return jsonify({"error": f"User '{receiver_name}' not found"}), 404
-            
+        # Strict ownership check
         if post.user_id != current_user.id:
             return jsonify({"error": "You can only share your own posts"}), 403
+        
+        # Handle both name and ID for receiver
+        if receiver_name.isdigit():
+            # If it's a numeric ID
+            receiver = User.query.get(int(receiver_name))
+            if not receiver:
+                return jsonify({"error": f"User with ID {receiver_name} not found"}), 404
+        else:
+            # If it's a username string
+            receiver = User.query.filter(User.name == receiver_name).first()
+            if not receiver:
+                return jsonify({"error": f"User '{receiver_name}' not found"}), 404
 
         # Check if already shared
         existing_share = SharedPost.query.filter_by(
@@ -391,7 +399,7 @@ def share_post():
         db.session.add(shared_post)
         db.session.commit()
 
-        return jsonify({"message": f"Post shared with {receiver.name}!"})
+        return jsonify({"message": f"Post shared with {receiver.name}!", "success": True})
     
     except Exception as e:
         db.session.rollback()
