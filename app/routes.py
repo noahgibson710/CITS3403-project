@@ -474,6 +474,16 @@ def respond_friend_request(request_id):
 def view_user_profile(user_id):
     user = User.query.get_or_404(user_id)
     if user.id == current_user.id:
+        return redirect(url_for('profile'))
+    
+    # Redirect to the username-based URL for better SEO and usability
+    return redirect(url_for('view_user_profile_by_name', username=user.name))
+
+@app.route('/profile/u/<username>')  # View another user's profile using their username
+@login_required
+def view_user_profile_by_name(username):
+    user = User.query.filter_by(name=username).first_or_404()
+    if user.id == current_user.id:
         return redirect(url_for('profile'))  
 
     macro_posts = MacroPost.query.filter_by(user_id=user.id).order_by(MacroPost.timestamp.desc()).all()
