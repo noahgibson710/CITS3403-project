@@ -156,7 +156,7 @@ def create_feed_post(post_id):
         # Update visibility if already shared
         existing_post.visibility = visibility
         db.session.commit()
-        flash(f"Visibility updated to {visibility} for this shared result.", "success")
+        # Remove flash message to prevent alerts
         return redirect(url_for("feed"))
 
     new_post = FeedPost(
@@ -166,7 +166,7 @@ def create_feed_post(post_id):
     )
     db.session.add(new_post)
     db.session.commit()
-    flash(f"Result shared to community feed with {visibility} visibility!", "success")
+    # Remove flash message to prevent alerts
     return redirect(url_for("feed"))
 
 @app.route("/about")
@@ -364,13 +364,21 @@ def share_post():
         if not post:
             return jsonify({"error": "Post not found"}), 404
         
-        # Find the receiver by name
-        receiver = User.query.filter(User.name == receiver_name).first()
-        if not receiver:
-            return jsonify({"error": f"User '{receiver_name}' not found"}), 404
-            
+        # Strict ownership check
         if post.user_id != current_user.id:
             return jsonify({"error": "You can only share your own posts"}), 403
+        
+        # Handle both name and ID for receiver
+        if receiver_name.isdigit():
+            # If it's a numeric ID
+            receiver = User.query.get(int(receiver_name))
+            if not receiver:
+                return jsonify({"error": f"User with ID {receiver_name} not found"}), 404
+        else:
+            # If it's a username string
+            receiver = User.query.filter(User.name == receiver_name).first()
+            if not receiver:
+                return jsonify({"error": f"User '{receiver_name}' not found"}), 404
 
         # Check if already shared
         existing_share = SharedPost.query.filter_by(
@@ -391,7 +399,7 @@ def share_post():
         db.session.add(shared_post)
         db.session.commit()
 
-        return jsonify({"message": f"Post shared with {receiver.name}!"})
+        return jsonify({"message": f"Post shared with {receiver.name}!", "success": True})
     
     except Exception as e:
         db.session.rollback()
@@ -435,14 +443,12 @@ def add_friend(user_id):
     receiver = User.query.get_or_404(user_id)
     # Check if the user is already a friend
     if FriendRequest.query.filter_by(requester_id=current_user.id, receiver_id=receiver.id).first():
-        flash("Friend request already sent!")
         return redirect(url_for('friends'))
     
     req = FriendRequest(requester=current_user, receiver=receiver, status='pending')
 
     db.session.add(req)
     db.session.commit()
-    flash("✅ Friend request sent", "success")
 
     return redirect(url_for('friends'))
 
@@ -469,12 +475,23 @@ def respond_friend_request(request_id):
 def view_user_profile(user_id):
     user = User.query.get_or_404(user_id)
     if user.id == current_user.id:
+        return redirect(url_for('profile'))
+    
+    # Redirect to the username-based URL for better SEO and usability
+    return redirect(url_for('view_user_profile_by_name', username=user.name))
+
+@app.route('/profile/u/<username>')  # View another user's profile using their username
+@login_required
+def view_user_profile_by_name(username):
+    user = User.query.filter_by(name=username).first_or_404()
+    if user.id == current_user.id:
         return redirect(url_for('profile'))  
 
     macro_posts = MacroPost.query.filter_by(user_id=user.id).order_by(MacroPost.timestamp.desc()).all()
     form = ProfilePictureForm()
 
-    already_sent = AddFriend.query.filter_by(sender_id=current_user.id, receiver_id=user.id).first()
+    # Check if a friend request has already been sent
+    already_sent = FriendRequest.query.filter_by(requester_id=current_user.id, receiver_id=user.id).first()
 
     return render_template(
         'profile.html', user=user, macro_posts=macro_posts, form=form, friend_request_sent=bool(already_sent)

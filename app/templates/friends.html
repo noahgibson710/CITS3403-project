@@ -3,25 +3,8 @@
 
 {% block content %}
 <div class="add-friends-container">
-    {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-        <div style="margin-bottom: 1.5rem;">
-          {% for category, message in messages %}
-            <div style="background: {% if category == 'success' %}#d4edda{% else %}#fff3cd{% endif %};
-                        color: {% if category == 'success' %}#155724{% else %}#856404{% endif %};
-                        border: 1px solid {% if category == 'success' %}#c3e6cb{% else %}#ffeeba{% endif %};
-                        padding: 10px 15px;
-                        border-radius: 6px;
-                        max-width: 600px;
-                        margin: 0 auto 1rem auto;
-                        text-align: center;
-                        box-shadow: 0 2px 6px rgba(0,0,0,0.08);">
-              {{ message }}
-            </div>
-          {% endfor %}
-        </div>
-      {% endif %}
-    {% endwith %}
+    <!-- Custom notification area instead of flash messages -->
+    <div id="notification-area" style="display: none;"></div>
 
     <h2>Find Users</h2>
     <div class="search-bar">
@@ -38,7 +21,7 @@
                         <li>
                             <div class="result-item">
                                 <h3>{{ friend.name}}</h3>
-                                <span><a href="{{ url_for('view_user_profile', user_id=friend.id) }}" class="username-link"><strong>View Profile</strong></a></span>
+                                <span><a href="{{ url_for('view_user_profile_by_name', username=friend.name) }}" class="username-link"><strong>View Profile</strong></a></span>
                             </div>
                         </li>
                     {% endfor %}
@@ -56,10 +39,10 @@
                     <li>
                         <div class="result-item">
                             <h3>From {{ request.requester.name }}</h3>
-                            <form method="POST" action="{{ url_for('respond_friend_request', request_id=request.request_id) }}">
-                                <button name = "decision" type="submit" value = "accept">Accept</button>
-                                <button name = "decision" type="submit" value="decline">Decline</button>
-                            </form>
+                            <div class="friend-request-actions">
+                                <button onclick="respondToRequest({{ request.request_id }}, 'accept')">Accept</button>
+                                <button onclick="respondToRequest({{ request.request_id }}, 'decline')">Decline</button>
+                            </div>
                         </div>
                     </li>
                 {% endfor %}
@@ -70,11 +53,60 @@
         </div>
 </div>
 
+<style>
+#notification-area {
+    max-width: 600px;
+    margin: 0 auto 20px;
+    padding: 12px 15px;
+    border-radius: 6px;
+    text-align: center;
+    font-weight: 500;
+    animation: fadeOut 5s forwards;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+
+.notification-success {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.notification-warning {
+    background-color: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeeba;
+}
+
+.notification-error {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+@keyframes fadeOut {
+    0% { opacity: 1; }
+    70% { opacity: 1; }
+    100% { opacity: 0; }
+}
+</style>
 </div>
 {% endblock %}
 
 {% block scripts %}
 <script>
+// Custom notification function to replace flash messages
+function showNotification(message, type = 'success') {
+    const notificationArea = document.getElementById('notification-area');
+    notificationArea.textContent = message;
+    notificationArea.className = `notification-${type}`;
+    notificationArea.style.display = 'block';
+    
+    // Auto-hide after animation completes
+    setTimeout(() => {
+        notificationArea.style.display = 'none';
+    }, 5000);
+}
+
 function searchUsers() {
     const query = document.getElementById("searchInput").value;
     if (!query) return;
@@ -94,14 +126,65 @@ function searchUsers() {
                 const item = document.createElement('li');
                 item.innerHTML = `
                     <div class="result-item">
-                        <span><a href="/profile/${user.id}" class="username-link"><strong>${user.name}</strong></a></span>
-                        <form method="POST" action="/add_friends/${user.id}">
-                            <button type="submit">Add Friend</button>
-                        </form>
+                        <span><a href="/profile/u/${encodeURIComponent(user.name)}" class="username-link"><strong>${user.name}</strong></a></span>
+                        <button onclick="addFriend(${user.id}, '${user.name}')">Add Friend</button>
                     </div>`;
                 resultsList.appendChild(item);
             });
+        })
+        .catch(error => {
+            console.error('Error searching users:', error);
+            showNotification('Error searching for users', 'error');
         });
+}
+
+function addFriend(userId, userName) {
+    fetch(`/add_friends/${userId}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        }
+    })
+    .then(response => {
+        if (response.ok) {
+            showNotification(`Friend request sent to ${userName}`, 'success');
+            // Refresh the page after a short delay to update the list
+            setTimeout(() => {
+                window.location.reload();
+            }, 2000);
+        } else {
+            showNotification('Friend request already sent', 'warning');
+        }
+    })
+    .catch(error => {
+        console.error('Error sending friend request:', error);
+        showNotification('Error sending friend request', 'error');
+    });
+}
+
+function respondToRequest(requestId, decision) {
+    const formData = new FormData();
+    formData.append('decision', decision);
+    
+    fetch(`/friend_requests/respond/${requestId}`, {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => {
+        if (response.ok) {
+            showNotification(decision === 'accept' ? 'Friend request accepted' : 'Friend request declined', 'success');
+            // Refresh the page after a short delay
+            setTimeout(() => {
+                window.location.reload();
+            }, 2000);
+        } else {
+            showNotification('Error responding to friend request', 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error responding to friend request:', error);
+        showNotification('Error responding to friend request', 'error');
+    });
 }
 
 document.addEventListener("DOMContentLoaded", function () {

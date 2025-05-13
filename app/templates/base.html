@@ -24,7 +24,7 @@
           <li><a href="{{ url_for('login') }}">Login</a></li>
           <li><a href="{{ url_for('calculator') }}">Macro Calc</a></li>
         {% endif %}
-        {% if current_user.is_authenticated and request.endpoint != 'view_user_profile' %}
+        {% if current_user.is_authenticated and request.endpoint != 'view_user_profile' and request.endpoint != 'view_user_profile_by_name' %}
         <li><a href="{{ url_for('calculator') }}">Macro Calc</a></li>
         {% endif %}
         <li><a href="{{ url_for('results') }}">Results</a></li>
