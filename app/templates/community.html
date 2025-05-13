@@ -5,25 +5,37 @@
 <div class="container">
   <h1>Community Feed</h1>
   
-  <!-- News Sharing Section - Added from news.html -->
+  <!-- News Sharing Section -->
   <section class="news-section">
     <h2>Peer-to-Peer News Sharing</h2>
     <p class="subtext">Here is where you will find results other users have shared with you</p>
+    <div class="friends-note">
+      <strong>Note:</strong> You can only share your results with users you've added as friends. Visit the <a href="{{ url_for('friends') }}">Add Friends</a> page to connect with more users.
+    </div>
 
-    <!-- Search bar to find users to share with -->
-    <form class="search-form" onsubmit="return false;" autocomplete="off">
-      <input type="text" id="user-search" placeholder="Search for users to share with..." />
-      <ul id="search-results" class="dropdown-menu"></ul>
+    <!-- Share form -->
+    <div class="sharing-container">
+      <form class="share-form" onsubmit="return false;">
+        <div class="form-group">
+          <label for="user-select">Select a friend to share with:</label>
+          <select id="user-select" class="form-select">
+            <option value="">Select a friend...</option>
+          </select>
+        </div>
 
-      <label for="post-selector">Select one of your macro results to share:</label>
-      <input type="text" id="post-selector" placeholder="Select your macro post..." readonly />
-      <ul id="post-results" class="dropdown-menu"></ul>
+        <div class="form-group">
+          <label for="post-select">Select one of your macro results to share:</label>
+          <select id="post-select" class="form-select">
+            <option value="">Select a post...</option>
+          </select>
+        </div>
 
-      <button type="button" id="share-button">Share</button>
-    </form>
+        <button type="button" id="share-button" class="btn-share">Share</button>
+      </form>
+    </div>
 
     <!-- Outbound sharing -->
-    <div class="news-container">
+    <div class="shared-posts-section">
       <h2>Posts You've Shared</h2>
       <div class="news-post" id="sent-posts">
         <p>Loading your shared posts...</p>
@@ -123,6 +135,11 @@
   margin-top: 20px;
 }
 
+h1, h2 {
+  text-align: center;
+  color: #FF6B6B;
+}
+
 .post-form {
   background: #657381;
   padding: 20px;
@@ -136,38 +153,50 @@
 
 .form-group label {
   display: block;
-  margin-bottom: 5px;
+  margin-bottom: 10px;
+  font-weight: bold;
+  color: #FF6B6B;
+}
+
+.form-select {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #444;
+  border-radius: 4px;
+  margin-bottom: 15px;
+  background-color: #222;
+  color: #fff;
+  font-size: 15px;
+}
+
+.btn-primary, .btn-share {
+  background: #FF6B6B;
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  width: 100%;
+  font-size: 16px;
   font-weight: bold;
 }
 
-textarea, select {
-  width: 100%;
-  padding: 8px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  margin-bottom: 10px;
+.btn-share:hover {
+  background: #FF5252;
 }
 
-.btn-primary {
-  background: #007bff;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.btn-primary:hover {
-  background: #0056b3;
+.btn-share:disabled {
+  background: #aaa;
+  cursor: not-allowed;
 }
 
 .post {
   background: rgb(101, 90, 90);
-  border: 1px solid #ddd;
+  border: 1px solid #444;
   border-radius: 8px;
   padding: 20px;
   margin-bottom: 20px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
 
 .post-header {
@@ -178,12 +207,12 @@ textarea, select {
 }
 
 .post-date {
-  color: #666;
+  color: #ccc;
   font-size: 0.9em;
 }
 
 .macro-results {
-  background: #f8f9fa;
+  background: rgba(255, 255, 255, 0.1);
   padding: 15px;
   border-radius: 4px;
   margin-top: 15px;
@@ -237,41 +266,32 @@ textarea, select {
   padding: 20px;
 }
 
-.search-form {
+.friends-note {
+  background: rgba(255, 107, 107, 0.1);
+  padding: 15px;
+  border-radius: 4px;
   margin-bottom: 20px;
-  position: relative;
+  border-left: 3px solid #FF6B6B;
 }
 
-.search-form input {
-  width: 100%;
-  padding: 8px;
-  margin-bottom: 10px;
+.friends-note a {
+  color: #FF6B6B;
+  text-decoration: underline;
+}
+
+.friends-note a:hover {
+  color: #FF5252;
+}
+
+.sharing-container {
+  background: rgba(0, 0, 0, 0.2);
+  padding: 20px;
   border-radius: 4px;
-  border: 1px solid #ddd;
+  margin-bottom: 25px;
 }
 
-.dropdown-menu {
-  position: absolute;
-  background: white;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  width: 100%;
-  max-height: 200px;
-  overflow-y: auto;
-  z-index: 1000;
-  display: none;
-  padding: 0;
-  margin: 0;
-  list-style: none;
-}
-
-.dropdown-item {
-  padding: 8px;
-  cursor: pointer;
-}
-
-.dropdown-item:hover {
-  background: #f5f5f5;
+.share-form {
+  margin-bottom: 0;
 }
 
 .news-container {
@@ -281,148 +301,224 @@ textarea, select {
 .news-post {
   margin-bottom: 10px;
 }
+
+.shared-post {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 15px;
+  border-radius: 4px;
+  margin-bottom: 15px;
+  border-left: 3px solid #28a745;
+}
+
+.shared-posts-section {
+  margin-top: 30px;
+}
+
+.shared-post p {
+  margin: 5px 0;
+}
 </style> 
 
 {% endblock %}
 
 {% block scripts %}
-  <script>
-    const input = document.getElementById('user-search');
-    const results = document.getElementById('search-results');
-    const postInput = document.getElementById('post-selector');
-    const postResults = document.getElementById('post-results');
-
-    // User search dropdown
-    input.addEventListener('input', () => {
-      const query = input.value.trim();
-      results.innerHTML = '';
-
-      if (query.length < 2) {
-        results.style.display = 'none';
-        return;
-      }
-
-      fetch(`/search_users?q=${encodeURIComponent(query)}`)
-        .then(res => res.json())
-        .then(data => {
-          if (data.length === 0) {
-            results.style.display = 'none';
-            return;
-          }
-
-          data.forEach(user => {
-            const item = document.createElement('li');
-            item.className = 'dropdown-item';
-            item.textContent = user.name;
-
-            item.onclick = () => {
-              input.value = user.name;
-              results.innerHTML = '';
-              results.style.display = 'none';
-            };
-
-            results.appendChild(item);
-          });
-
-          results.style.display = 'block';
-        });
-    });
-
-    // Macro post dropdown
-    postInput.addEventListener('focus', () => {
-      fetch('/my_macroposts')
-        .then(res => res.json())
-        .then(data => {
-          postResults.innerHTML = '';
-          if (data.length === 0) {
-            const emptyItem = document.createElement('li');
-            emptyItem.className = 'dropdown-item';
-            emptyItem.textContent = 'No posts available.';
-            postResults.appendChild(emptyItem);
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const userSelect = document.getElementById('user-select');
+    const postSelect = document.getElementById('post-select');
+    const shareButton = document.getElementById('share-button');
+    const sentPostsContainer = document.getElementById('sent-posts');
+    const receivedPostsContainer = document.getElementById('received-posts');
+    
+    // Fetch users to populate the dropdown
+    function loadUsers() {
+      console.log('Loading friends');
+      fetch('/search_users?q=')
+        .then(response => response.json())
+        .then(users => {
+          console.log('Friends loaded:', users);
+          userSelect.innerHTML = '<option value="">Select a friend...</option>';
+          
+          if (users.length === 0) {
+            // No friends available
+            const noFriendsOption = document.createElement('option');
+            noFriendsOption.disabled = true;
+            noFriendsOption.textContent = 'No friends available - add friends first';
+            userSelect.appendChild(noFriendsOption);
+            
+            // Disable share button if no friends
+            shareButton.disabled = true;
           } else {
-            data.forEach(post => {
-              const item = document.createElement('li');
-              item.className = 'dropdown-item';
-              item.textContent = `Age ${post.age}, ${post.weight}kg, ${post.height}cm – TDEE: ${post.tdee}`;
-              item.onclick = () => {
-                postInput.value = `Post #${post.id} – Age ${post.age}, TDEE ${post.tdee}`;
-                postResults.innerHTML = '';
-                postResults.style.display = 'none';
-              };
-              postResults.appendChild(item);
+            // Add each friend to the dropdown
+            users.forEach(user => {
+              const option = document.createElement('option');
+              option.value = user.name;
+              option.textContent = user.name;
+              userSelect.appendChild(option);
+            });
+            
+            // Enable share button
+            shareButton.disabled = false;
+          }
+        })
+        .catch(error => {
+          console.error('Error loading friends:', error);
+          userSelect.innerHTML = '<option value="">Error loading friends</option>';
+        });
+    }
+    
+    // Fetch macro posts to populate the dropdown
+    function loadMacroPosts() {
+      console.log('Loading macro posts');
+      fetch('/my_macroposts')
+        .then(response => response.json())
+        .then(posts => {
+          console.log('Macro posts loaded:', posts);
+          postSelect.innerHTML = '<option value="">Select a post...</option>';
+          
+          if (posts.length === 0) {
+            const emptyOption = document.createElement('option');
+            emptyOption.disabled = true;
+            emptyOption.textContent = 'No macro posts available';
+            postSelect.appendChild(emptyOption);
+            shareButton.disabled = true;
+          } else {
+            posts.forEach(post => {
+              const option = document.createElement('option');
+              option.value = post.id;
+              option.textContent = `Age: ${post.age}, Weight: ${post.weight}kg, TDEE: ${post.tdee}`;
+              postSelect.appendChild(option);
             });
           }
-          postResults.style.display = 'block';
+        })
+        .catch(error => {
+          console.error('Error loading macro posts:', error);
+          postSelect.innerHTML = '<option value="">Error loading posts</option>';
         });
-    });
-
-    // Hide dropdowns when clicking outside
-    document.addEventListener('click', function (e) {
-      if (!input.contains(e.target) && !results.contains(e.target)) {
-        results.innerHTML = '';
-        results.style.display = 'none';
-      }
-      if (!postInput.contains(e.target) && !postResults.contains(e.target)) {
-        postResults.innerHTML = '';
-        postResults.style.display = 'none';
-      }
-    });
-
-    document.getElementById('share-button').addEventListener('click', () => {
-      const user = input.value.trim();
-      const postMatch = postInput.value.match(/Post #(\d+)/);
-
-      if (!user) {
-        alert('Please select a user to share with.');
+    }
+    
+    // Load shared posts
+    function loadSharedPosts() {
+      console.log('Loading shared posts');
+      
+      // Set loading state
+      sentPostsContainer.innerHTML = '<p>Loading your shared posts...</p>';
+      receivedPostsContainer.innerHTML = '<p>Loading posts shared with you...</p>';
+      
+      fetch('/shared_posts')
+        .then(response => response.json())
+        .then(data => {
+          console.log('Shared posts loaded:', data);
+          
+          // Update sent posts
+          if (data.sent && data.sent.length > 0) {
+            sentPostsContainer.innerHTML = '';
+            data.sent.forEach(post => {
+              const postElement = document.createElement('div');
+              postElement.className = 'shared-post';
+              postElement.innerHTML = `
+                <p><strong>Shared with:</strong> ${post.shared_with}</p>
+                <p><strong>Age:</strong> ${post.age}, <strong>Weight:</strong> ${post.weight}kg, <strong>Height:</strong> ${post.height}cm</p>
+                <p><strong>TDEE:</strong> ${post.tdee} calories</p>
+                <p><strong>Shared on:</strong> ${post.timestamp}</p>
+              `;
+              sentPostsContainer.appendChild(postElement);
+            });
+          } else {
+            sentPostsContainer.innerHTML = '<p>You haven\'t shared any posts yet.</p>';
+          }
+          
+          // Update received posts
+          if (data.received && data.received.length > 0) {
+            receivedPostsContainer.innerHTML = '';
+            data.received.forEach(post => {
+              const postElement = document.createElement('div');
+              postElement.className = 'shared-post';
+              postElement.innerHTML = `
+                <p><strong>From:</strong> ${post.shared_with}</p>
+                <p><strong>Age:</strong> ${post.age}, <strong>Weight:</strong> ${post.weight}kg, <strong>Height:</strong> ${post.height}cm</p>
+                <p><strong>TDEE:</strong> ${post.tdee} calories</p>
+                <p><strong>Shared on:</strong> ${post.timestamp}</p>
+              `;
+              receivedPostsContainer.appendChild(postElement);
+            });
+          } else {
+            receivedPostsContainer.innerHTML = '<p>No one has shared posts with you yet.</p>';
+          }
+        })
+        .catch(error => {
+          console.error('Error loading shared posts:', error);
+          sentPostsContainer.innerHTML = '<p>Error loading shared posts. Please try again.</p>';
+          receivedPostsContainer.innerHTML = '<p>Error loading shared posts. Please try again.</p>';
+        });
+    }
+    
+    // Share button handler
+    shareButton.addEventListener('click', function() {
+      const selectedUser = userSelect.value;
+      const selectedPostId = postSelect.value;
+      
+      if (!selectedUser) {
+        alert('Please select a friend to share with');
         return;
       }
-
-      if (!postMatch) {
-        alert('Please select a macro post to share.');
+      
+      if (!selectedPostId) {
+        alert('Please select a post to share');
         return;
       }
-
-      const postId = postMatch[1];
-
+      
+      console.log('Sharing post:', { user: selectedUser, postId: selectedPostId });
+      
+      // Disable button during request
+      shareButton.disabled = true;
+      shareButton.textContent = 'Sharing...';
+      
       fetch('/share_post', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ receiver: user, post_id: postId })
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          receiver: selectedUser,
+          post_id: selectedPostId
+        })
       })
-      .then(res => res.json())
+      .then(response => response.json())
       .then(data => {
+        console.log('Share response:', data);
+        
+        // Reset button
+        shareButton.disabled = false;
+        shareButton.textContent = 'Share';
+        
         if (data.error) {
           alert(`Error: ${data.error}`);
         } else {
-          alert(`Post shared with ${user}!`);
-          fetchSharedPosts(); // Refresh shared posts
+          alert(data.message || 'Post shared successfully!');
+          
+          // Reset selects
+          userSelect.selectedIndex = 0;
+          postSelect.selectedIndex = 0;
+          
+          // Refresh the shared posts
+          loadSharedPosts();
         }
       })
-      .catch(err => {
-        alert('Failed to share post.');
-        console.error(err);
+      .catch(error => {
+        console.error('Error sharing post:', error);
+        alert('Failed to share post. Please try again.');
+        
+        // Reset button
+        shareButton.disabled = false;
+        shareButton.textContent = 'Share';
       });
     });
-
-    // Fetch shared posts from backend
-    function fetchSharedPosts() {
-      fetch('/shared_posts')
-        .then(res => res.json())
-        .then(data => {
-          const sentContainer = document.getElementById('sent-posts');
-          const receivedContainer = document.getElementById('received-posts');
-
-          sentContainer.innerHTML = data.sent.length
-            ? data.sent.map(p => `<p>Shared with <strong>${p.shared_with}</strong>: Age ${p.age}, TDEE ${p.tdee}</p>`).join('')
-            : '<p>You haven't shared anything yet.</p>';
-
-          receivedContainer.innerHTML = data.received.length
-            ? data.received.map(p => `<p>From <strong>${p.shared_with}</strong>: Age ${p.age}, TDEE ${p.tdee}</p>`).join('')
-            : '<p>No shared results yet. When someone shares with you, they\'ll appear here!</p>';
-        });
-    }
-
-    // Initial fetch on page load
-    fetchSharedPosts();
-  </script>
+    
+    // Initialize the page
+    loadUsers();
+    loadMacroPosts();
+    loadSharedPosts();
+  });
+</script>
 {% endblock %}

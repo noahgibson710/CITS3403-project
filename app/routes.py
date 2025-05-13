@@ -308,9 +308,16 @@ def news():
 def search_users():
     query = request.args.get('q', '')
     results = []
-    if query:
-        users = User.query.filter(User.name.ilike(f"%{query}%"), ~User.friends.any(id=current_user.id)).all()
-        results = [{'id': user.id, 'name': user.name} for user in users if user.id != current_user.id]
+    
+    # If query is empty, return only friends (for dropdown)
+    if query == '':
+        friends = current_user.friends.all()
+        results = [{'id': friend.id, 'name': friend.name} for friend in friends]
+    # Otherwise search by name but only within friends
+    elif query:
+        friends = current_user.friends.filter(User.name.ilike(f"%{query}%")).all()
+        results = [{'id': friend.id, 'name': friend.name} for friend in friends]
+    
     return jsonify(results)
 
 @app.route('/friends/list', methods=['GET'])
@@ -345,41 +352,51 @@ def get_my_macroposts():
 @login_required
 def share_post():
     data = request.get_json()
-    friend_id = data.get('friend_id')
+    receiver_name = data.get('receiver') 
     post_id = data.get('post_id')
 
-    if not friend_id or not post_id:
-        return jsonify({'success': False, 'message': 'Missing required data'}), 400
+    if not receiver_name or not post_id:
+        return jsonify({"error": "Missing receiver name or post ID"}), 400
 
-    friend = User.query.get(friend_id)
-    post = MacroPost.query.get(post_id)
+    try:
+        post_id = int(post_id)
+        post = MacroPost.query.get(post_id)
+        if not post:
+            return jsonify({"error": "Post not found"}), 404
+        
+        # Find the receiver by name
+        receiver = User.query.filter(User.name == receiver_name).first()
+        if not receiver:
+            return jsonify({"error": f"User '{receiver_name}' not found"}), 404
+            
+        if post.user_id != current_user.id:
+            return jsonify({"error": "You can only share your own posts"}), 403
 
-    if not friend or not post:
-        return jsonify({'success': False, 'message': 'Invalid friend or post'}), 400
+        # Check if already shared
+        existing_share = SharedPost.query.filter_by(
+            sender_id=current_user.id,
+            receiver_id=receiver.id,
+            post_id=post.id
+        ).first()
 
-    if post.user_id != current_user.id:
-        return jsonify({'success': False, 'message': 'You can only share your own posts'}), 403
+        if existing_share:
+            return jsonify({"message": f"Already shared with {receiver.name}"})
 
-    # Check if already shared with this friend
-    existing_share = SharedPost.query.filter_by(
-        sender_id=current_user.id,
-        receiver_id=friend.id,
-        post_id=post.id
-    ).first()
+        # Create new shared post
+        shared_post = SharedPost(
+            sender_id=current_user.id,
+            receiver_id=receiver.id,
+            post_id=post.id
+        )
+        db.session.add(shared_post)
+        db.session.commit()
 
-    if existing_share:
-        return jsonify({'success': True, 'message': 'Already shared with this friend'})
-
-    # Create new shared post
-    shared_post = SharedPost(
-        sender_id=current_user.id,
-        receiver_id=friend.id,
-        post_id=post.id
-    )
-    db.session.add(shared_post)
-    db.session.commit()
-
-    return jsonify({'success': True, 'message': 'Post shared successfully'})
+        return jsonify({"message": f"Post shared with {receiver.name}!"})
+    
+    except Exception as e:
+        db.session.rollback()
+        print(f"Error sharing post: {str(e)}")
+        return jsonify({"error": f"Server error: {str(e)}"}), 500
 
 @app.route('/shared_posts')
 @login_required
