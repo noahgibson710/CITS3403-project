@@ -21,7 +21,7 @@
                         <li>
                             <div class="result-item">
                                 <h3>{{ friend.name}}</h3>
-                                <span><a href="{{ url_for('view_user_profile', user_id=friend.id) }}" class="username-link"><strong>View Profile</strong></a></span>
+                                <span><a href="{{ url_for('view_user_profile_by_name', username=friend.name) }}" class="username-link"><strong>View Profile</strong></a></span>
                             </div>
                         </li>
                     {% endfor %}
@@ -126,7 +126,7 @@ function searchUsers() {
                 const item = document.createElement('li');
                 item.innerHTML = `
                     <div class="result-item">
-                        <span><a href="/profile/${user.id}" class="username-link"><strong>${user.name}</strong></a></span>
+                        <span><a href="/profile/u/${encodeURIComponent(user.name)}" class="username-link"><strong>${user.name}</strong></a></span>
                         <button onclick="addFriend(${user.id}, '${user.name}')">Add Friend</button>
                     </div>`;
                 resultsList.appendChild(item);
