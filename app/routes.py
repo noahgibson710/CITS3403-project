@@ -301,7 +301,7 @@ def delete_profile_picture():
 @app.route("/news")
 @login_required  # optional: restrict access to logged-in users
 def news():
-    return render_template("news.html")
+    return redirect(url_for('feed'))
 
 @app.route('/search_users', methods=['GET'])
 @login_required
