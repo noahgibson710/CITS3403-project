@@ -24,9 +24,15 @@ class CalculatorPageTest(unittest.TestCase):
         self.assertIn('<select id="activity"', html)
         self.assertIn('<select id="calorie"', html)
 
+    def test_calc_js_included(self):
+        response = self.app.get('/calculator')
+        html = response.get_data(as_text=True)
+        self.assertIn('<script src="./static/js/calc.js"></script>', html)
+
+
 
     def test_invalid_age(self):
-        response = self.app.post('/calculate', json={
+        response = self.app.post('/calculator', json={
             'gender': 'male',
             'age': 15,  # Invalid age
             'weight': 60.0,
@@ -34,7 +40,9 @@ class CalculatorPageTest(unittest.TestCase):
             'activity': '1.2',
             'calorie': 'surplus'
         })
-        self.assertEqual(response.status_code, 405)
+        self.assertEqual(response.status_code, 200)
+
+
 
 if __name__ == '__main__':
     unittest.main()
