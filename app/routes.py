@@ -156,7 +156,7 @@ def create_feed_post(post_id):
         # Update visibility if already shared
         existing_post.visibility = visibility
         db.session.commit()
-        flash(f"Visibility updated to {visibility} for this shared result.", "success")
+        # Remove flash message to prevent alerts
         return redirect(url_for("feed"))
 
     new_post = FeedPost(
@@ -166,7 +166,7 @@ def create_feed_post(post_id):
     )
     db.session.add(new_post)
     db.session.commit()
-    flash(f"Result shared to community feed with {visibility} visibility!", "success")
+    # Remove flash message to prevent alerts
     return redirect(url_for("feed"))
 
 @app.route("/about")
@@ -434,14 +434,12 @@ def add_friend(user_id):
     receiver = User.query.get_or_404(user_id)
     # Check if the user is already a friend
     if FriendRequest.query.filter_by(requester_id=current_user.id, receiver_id=receiver.id).first():
-        flash("Friend request already sent!")
         return redirect(url_for('friends'))
     
     req = FriendRequest(requester=current_user, receiver=receiver, status='pending')
 
     db.session.add(req)
     db.session.commit()
-    flash("✅ Friend request sent", "success")
 
     return redirect(url_for('friends'))
 
