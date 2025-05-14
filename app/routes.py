@@ -299,7 +299,7 @@ def delete_profile_picture():
     return redirect(url_for('profile'))
 
 @app.route("/news")
-@login_required  # optional: restrict access to logged-in users
+@login_required  
 def news():
     return redirect(url_for('feed'))
 
@@ -308,17 +308,29 @@ def news():
 def search_users():
     query = request.args.get('q', '')
     results = []
-    
-    # If query is empty, return only friends (for dropdown)
-    if query == '':
-        friends = current_user.friends.all()
-        results = [{'id': friend.id, 'name': friend.name} for friend in friends]
-    # Otherwise search by name but only within friends
-    elif query:
-        friends = current_user.friends.filter(User.name.ilike(f"%{query}%")).all()
-        results = [{'id': friend.id, 'name': friend.name} for friend in friends]
-    
+
+    if query:
+        users = User.query.filter(
+            User.name.ilike(f"%{query}%"),
+            User.id != current_user.id
+        ).all()
+
+        for user in users:
+            # Check if already friends
+            is_friend = current_user.friends.filter_by(id=user.id).first() is not None
+            # Check if request already sent or received
+            sent_request = FriendRequest.query.filter_by(requester_id=current_user.id, receiver_id=user.id, status='pending').first()
+            received_request = FriendRequest.query.filter_by(requester_id=user.id, receiver_id=current_user.id, status='pending').first()
+            
+            results.append({
+                'id': user.id,
+                'name': user.name,
+                'is_friend': is_friend,
+                'request_pending': bool(sent_request or received_request)
+            })
+
     return jsonify(results)
+
 
 @app.route('/friends/list', methods=['GET'])
 @login_required
@@ -419,6 +431,7 @@ def shared_posts():
             'weight': sp.post.weight,
             'height': sp.post.height,
             'tdee': sp.post.tdee,
+            'calorie_goal': sp.post.calorie_goal.capitalize(),
             'timestamp': sp.timestamp.strftime('%Y-%m-%d'),
             'shared_with': sp.receiver.name if sp.sender_id == current_user.id else sp.sender.name
         }
@@ -440,16 +453,41 @@ def friends():
 @login_required
 def add_friend(user_id):
     receiver = User.query.get_or_404(user_id)
-    # Check if the user is already a friend
-    if FriendRequest.query.filter_by(requester_id=current_user.id, receiver_id=receiver.id).first():
+    
+    # Check if there's an add friend request is already made
+    existing_request = FriendRequest.query.filter_by(
+        requester_id=current_user.id, 
+        receiver_id=receiver.id
+    ).first()
+    
+    # Check if users are already friends
+    already_friends = current_user.friends.filter_by(id=user_id).first()
+    
+    if already_friends:
+    # Prevent duplicate add friends request 
+        flash(f"You are already friends with {receiver.name}", "info")
         return redirect(url_for('friends'))
     
+    if existing_request:
+    # If previous request is declined the user can send request again
+        if existing_request.status == 'declined':
+            existing_request.status = 'pending'
+            existing_request.timestamp = datetime.now()
+            db.session.commit()
+            flash(f"Friend request sent to {receiver.name}", "success")
+        else: 
+            flash(f"You already have a connection with {receiver.name}", "info")
+        
+        return redirect(url_for('friends'))
+    
+    # Create new friend request
     req = FriendRequest(requester=current_user, receiver=receiver, status='pending')
-
     db.session.add(req)
     db.session.commit()
-
+    
+    flash(f"Friend request sent to {receiver.name}", "success")
     return redirect(url_for('friends'))
+
 
 @app.route('/friend_requests/respond/<int:request_id>', methods=['POST'])
 @login_required
