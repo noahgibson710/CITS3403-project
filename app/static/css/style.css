@@ -276,9 +276,9 @@ section p {
   transform: scale(1.2); 
   margin-right: 8px;
   margin-top: 2.5px;
-  transform: scale(1.2);
   vertical-align: middle;
 }
+
 #show-password-label-checkbox {
   display: flex;
   align-items: center;
@@ -652,6 +652,10 @@ nav ul {
   grid-row: 2;
 }
 
+.search-bar button:hover {
+  background-color: #ff4b4b;
+}
+
 .search-results {
   list-style: none;
   padding: 0;
@@ -668,11 +672,22 @@ nav ul {
   border-radius: 8px;
   padding: 15px 20px;
   margin-bottom: 15px;
+  width: 100%;
 }
 
+.result-item h3,
+.result-item span,
 .result-item strong {
-  color: #fff;
+  margin: 0;
+  flex: 1;
+  text-align: left;
   font-size: 1.1rem;
+  color: #fff;
+}
+
+.friend-request-actions {
+  display: flex;
+  gap: 10px;
 }
 
 .result-item form {
@@ -680,14 +695,16 @@ nav ul {
 }
 
 .result-item button {
+  width: auto;
+  margin: 0;
+  padding: 8px 15px;
   background-color: #ff6b6b;
   color: #000;
   border: none;
   border-radius: 5px;
-  padding: 8px 15px;
   font-weight: bold;
   cursor: pointer;
-  margin-left: auto;
+  transition: background-color 0.3s ease;
 }
 
 .result-item button:hover {
@@ -712,9 +729,7 @@ nav ul {
   color: #ff6b6b;
 }
 
-.result-item,
-.result-item > *,
-.result-item > * > * {
+.result-item {
   background-color: #252525 !important;
   padding: 0 !important;
   margin: 0 !important;
@@ -722,22 +737,13 @@ nav ul {
   box-shadow: none !important;
 }
 
-.result-item {
-  display: flex !important;
-  justify-content: space-between !important;
-  align-items: center !important;
-  padding: 15px 20px !important;
-  border-radius: 8px !important;
-  margin-bottom: 15px !important;
+.decline-btn {
+  background-color: #555 !important;
+  color: #fff !important;
 }
 
-.result-item button {
-  background-color: #ff6b6b !important;
-  color: #000 !important;
-  border-radius: 5px !important;
-  padding: 8px 15px !important;
-  font-weight: bold !important;
-  cursor: pointer !important;
+.decline-btn:hover {
+  background-color: #777 !important;
 }
 
 input,
