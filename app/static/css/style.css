@@ -56,14 +56,14 @@ nav a:hover::after {
 }
 
 /* Form styling */
-form {
+/* form {
   background-color: #1a1a1a;
   padding: 2rem;
   border-radius: 10px;
   max-width: 500px;
   margin: 2rem auto;
   box-shadow: 0 0 10px rgba(255, 107, 107, 0.2);
-}
+} */
 
 label {
   font-weight: bold;
@@ -359,8 +359,8 @@ section p {
 
 .macro-history ul {
   list-style: none;
-  padding: 0;
-  margin: 0;
+  padding: 0px;
+  margin: 0px;
 }
 
 .macro-history li {
@@ -368,12 +368,11 @@ section p {
   border: 1px solid #333;
   border-left: 5px solid #ff6b6b;
   border-radius: 8px;
-  padding: 1rem;
   margin-bottom: 1rem;
   box-shadow: 0 0 8px rgba(255, 107, 107, 0.1);
   transition: transform 0.2s ease;
   display: flex;
-  justify-content: space-evenly;
+  justify-content: space-between;
   align-items: flex-start;
   gap: 1rem;
 }
@@ -401,6 +400,10 @@ section p {
     flex: 0.5;
 }
 
+.macro-history .actions {
+  display: flex;
+  flex-direction: column;
+}
 .macro-history li .actions {
   display: block;
   align-self: start;
@@ -415,10 +418,10 @@ section p {
 .macro-history button {
   width: 50%;
   margin-block: 1rem;
+  color: white;
 }
 
 .macro-history form {
-  background-color: #1a1a1a;
   padding: 0;
   margin: 1rem;
 }

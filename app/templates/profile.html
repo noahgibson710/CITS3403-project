@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% import "./components/resultTab.html" as ui %}
 
 {% block title %}Profile Page{% endblock %}
 
@@ -27,6 +28,7 @@
         {% endif %}
 
     </header>
+
         {% if current_user.id != user.id %}
             <div class="profile-warning-box">
                 <p>You are viewing another user's profile.</p>
@@ -124,35 +126,15 @@
             <ul>
                 {% for post in macro_posts %}
                     <li>
-                        <strong>Date:</strong> {{ post.timestamp.strftime('%Y-%m-%d %H:%M') }}<br>
-                        <strong>Weight:</strong> {{ post.weight }} kg<br>
-                        <strong>BMR:</strong> {{ post.bmr }} cal/day,
-                        <strong>TDEE:</strong> {{ post.tdee }} cal/day<br>        
-                        <strong>Calorie Goal:</strong> {{ post.calorie_goal|capitalize }}
+                        <div class="info">
+                            {{ ui.history_item(post) }}
+                        </div>
                         {% if user.id == current_user.id %}
-                        <form action="{{ url_for('delete_macro_post', post_id=post.id) }}" method="POST" style="inline">
-                            <button type="submit" onclick="return confirm('Are you sure you want to delete this entry?');">Delete</button>
-                        </form>
-                        <form action="{{ url_for('create_feed_post', post_id=post.id) }}" method="POST" style="inline">
-                            {% if macro_posts %}
-                                <input type="hidden" name="content" value="Latest Macro Stats - Weight: {{ macro_posts[-1].weight }}kg, BMR: {{ macro_posts[-1].bmr }}, TDEE: {{ macro_posts[-1].tdee }}">
-                            {% else %}
-                                <input type="hidden" name="content" value="No macro stats available.">
-                            {% endif %}
-                            <div style="margin-top: 8px; display: flex; align-items: center;">
-                                <select name="visibility" style="margin-right: 8px; padding: 4px;">
-                                    <option value="public">Public (Everyone)</option>
-                                    <option value="friends">Friends Only</option>
-                                    <option value="private">Private (Only Me)</option>
-                                </select>
-                                <button type="submit">Share to Community Feed</button>
-                            </div>
-                        </form>
-                        
-                        <!-- Share with specific friends button -->
-                        <button onclick="openShareModal('{{ post.id }}')" class="share-btn" style="margin-top: 8px;">
-                            Direct Share with Friends
-                        </button>
+                        <div class="actions">
+                            {{ ui.delete_button(post.id) }}
+                            {{ ui.community_share_button(post.id) }}
+                            {{ ui.friend_share_button(post.id) }}
+                        </div>
                         {% endif %}
                     </li>
                 {% endfor %}
