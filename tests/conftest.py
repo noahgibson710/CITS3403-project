@@ -17,17 +17,26 @@ from werkzeug.security import generate_password_hash
 @pytest.fixture
 def client():
     """Create a test client for the app."""
+    # Configure the app for testing
     app.config['TESTING'] = True
     app.config['WTF_CSRF_ENABLED'] = False
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
     
+    # Create app context explicitly and push it
+    app_context = app.app_context()
+    app_context.push()
+    
+    # Create all tables
+    db.create_all()
+    
+    # Create and yield the test client
     with app.test_client() as client:
-        with app.app_context():
-            # Make sure to create all tables in the database
-            db.create_all()
-            yield client
-            db.session.remove()
-            db.drop_all()
+        yield client
+    
+    # Clean up
+    db.session.remove()
+    db.drop_all()
+    app_context.pop()
 
 def get_unique_username():
     """Generate a unique username for testing."""
@@ -41,24 +50,23 @@ def get_unique_email():
 def auth_client(client):
     """Create an authenticated test client."""
     # Create a test user with unique username and email
-    with app.app_context():
-        username = get_unique_username()
-        email = get_unique_email()
-        
-        user = User(
-            name=username,
-            email=email,
-            password=generate_password_hash('password'),
-            gender='Male',
-            age=25
-        )
-        db.session.add(user)
-        db.session.commit()
-        
-        # Log in the user
-        client.post('/login', data={
-            'email': email,
-            'password': 'password'
-        }, follow_redirects=True)
-        
-        yield client, user  # Return both client and user object 
+    username = get_unique_username()
+    email = get_unique_email()
+    
+    user = User(
+        name=username,
+        email=email,
+        password=generate_password_hash('password'),
+        gender='Male',
+        age=25
+    )
+    db.session.add(user)
+    db.session.commit()
+    
+    # Log in the user
+    client.post('/login', data={
+        'email': email,
+        'password': 'password'
+    }, follow_redirects=True)
+    
+    yield client, user  # Return both client and user object 
