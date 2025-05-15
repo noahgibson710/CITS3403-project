@@ -1,8 +1,12 @@
 import unittest
-from app import app
-from flask_login import login_user
-from flask.testing import FlaskClient
+import sys
+import os
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+from app import app, db
 from app.models import User
+from werkzeug.security import generate_password_hash
+import pytest
 
 class CalculatorPageTest(unittest.TestCase):
     def setUp(self):
