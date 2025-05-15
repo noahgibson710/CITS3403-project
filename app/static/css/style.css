@@ -458,60 +458,122 @@ input:checked + .slider::before {
 }
 
 body.light-mode {
-  background-color: #fdfdfd;
-  color: #111;
+  background-color: #f7f7f7;
+  color: #222;
 }
 
 body.light-mode h1, 
 body.light-mode h2,
 body.light-mode section h2 {
-  color: #d13438;
+  color: #b33a3a;
 }
 
 body.light-mode form,
-body.light-mode section {
-  background-color: #fff;
-  color: #111;
-  box-shadow: 0 0 15px rgba(211, 52, 56, 0.1);
+body.light-mode section,
+body.light-mode .profile-card {
+  background-color: #ffffff;
+  color: #222;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.08);
+  border-radius: 12px;
 }
 
 body.light-mode input,
-body.light-mode select,
-body.light-mode button {
+body.light-mode select {
   background-color: #eee;
   color: #000;
+  border: 1px solid #ccc;
+}
+
+body.light-mode button {
+  background-color: #cc4444;
+  color: #fff;
+  border: none;
+}
+
+body.light-mode button:hover {
+  background-color: #b33a3a;
 }
 
 body.light-mode nav a {
-  color: #d13438;
+  color: #b33a3a;
 }
 
 body.light-mode nav a::after {
-  background-color: #d13438;
-}
-
-body.light-mode .macro-history li {
-  background-color: #f5f5f5;
-  border-color: #ccc;
-  border-left-color: #d13438;
-  color: #111;
+  background-color: #b33a3a;
 }
 
 body.light-mode .theme-label {
-  color: #d13438;
+  color: #b33a3a;
 }
 
-body.light-mode .hero {
-  background-color: #fff; 
-  box-shadow: 0 0 20px rgba(211, 52, 56, 0.2);
+body.light-mode .macro-history li {
+  background-color: #f1f1f1;
+  border-left: 4px solid #b33a3a;
+  color: #222;
 }
 
-body.light-mode .hero h1 {
-  color: #d13438;
+body.light-mode .result-item {
+  background-color: #f9f9f9;
 }
 
-body.light-mode .hero p {
-  color: #333;
+body.light-mode .profile-picture {
+  border: 2px solid #cc4444;
+}
+
+body.light-mode .add-friends-container {
+  background-color: #ffffff;
+  color: #222;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+body.light-mode .search-bar input {
+  background-color: #f0f0f0;
+  color: #000;
+  border: 1px solid #ccc;
+}
+
+body.light-mode .result-item {
+  background-color: #f9f9f9;
+  color: #000;
+}
+
+.profile-line {
+  background-color: #222;
+  color: #ffb3b3;
+  padding: 0.5em 1em;
+  border-radius: 8px;
+  font-weight: bold;
+  box-shadow: 0 2px 8px rgba(255, 107, 107, 0.25);
+}
+
+.highlight-text {
+  color: #ff6b6b;
+}
+
+body.light-mode .profile-line {
+  background-color: #fff;
+  color: #b33a3a;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.profile-info h2.username-box {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #ff6b6b;
+  margin-bottom: 0.5em;
+}
+
+body.light-mode .profile-info h2.username-box {
+  background-color: #fff !important;
+  border: none;               
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+body.light-mode .profile-info form {
+  background-color: #fff !important;
+  color: #222;
+  border: none;               
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
 }
 
 #macro-history-graph {

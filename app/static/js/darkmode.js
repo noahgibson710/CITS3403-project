@@ -1,14 +1,3 @@
-
-// Check if a theme preference is stored in localStorage
-window.onload = function() {
-const savedTheme = localStorage.getItem('theme');
-if (savedTheme) {
-    document.body.classList.add(savedTheme);
-} else {
-    document.body.classList.add('dark-mode'); // Default theme
-}
-};
-
 // Function to toggle theme and store preference
 function toggleTheme() {
 const currentTheme = document.body.classList.contains('light-mode') ? 'light-mode' : 'dark-mode';
