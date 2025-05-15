@@ -14,6 +14,20 @@ from sqlalchemy import and_, or_
 from flask import flash
 
 
+# Add security headers to all responses
+@app.after_request
+def add_security_headers(response):
+    # Protect against XSS attacks
+    response.headers['X-Content-Type-Options'] = 'nosniff'
+    # Prevent clickjacking
+    response.headers['X-Frame-Options'] = 'DENY'
+    # Prevent MIME type sniffing
+    response.headers['X-Content-Type-Options'] = 'nosniff'
+    # Enable XSS protection in browsers
+    response.headers['X-XSS-Protection'] = '1; mode=block'
+    return response
+
+
 @app.route('/')
 def home():  #If logged in then it should stay on the profile page when clicking on 'home'
     if current_user.is_authenticated:
@@ -262,19 +276,50 @@ def update_profile_picture():
         if form.picture.data:
             # Save the picture
             picture_file = form.picture.data
-            picture_filename = secrets.token_hex(8) + os.path.splitext(picture_file.filename)[1]
+            
+            # Validate file type more thoroughly
+            allowed_extensions = ['jpg', 'jpeg', 'png']
+            file_ext = os.path.splitext(picture_file.filename)[1].lower().replace('.', '')
+            if file_ext not in allowed_extensions:
+                flash('Invalid file type. Only jpg, jpeg, and png files are allowed.', 'danger')
+                return redirect(url_for('profile'))
+                
+            # Generate a secure filename
+            picture_filename = secrets.token_hex(8) + '.' + file_ext
             picture_path = os.path.join(app.root_path, 'static/profile_pics', picture_filename)
             
             # Create directory if it doesn't exist
             os.makedirs(os.path.dirname(picture_path), exist_ok=True)
             
-            # Save the file
-            picture_file.save(picture_path)
-            
-            # Update user's profile picture
-            current_user.profile_picture = picture_filename
-            db.session.commit()
-            flash('Profile picture updated successfully!', 'success')
+            try:
+                # Validate image with PIL
+                img = Image.open(picture_file)
+                img.verify()  # Verify it's an actual image
+                
+                # Reopen after verify (verify closes the file)
+                picture_file.seek(0)
+                img = Image.open(picture_file)
+                
+                # Resize to reasonable dimensions if needed
+                if img.height > 500 or img.width > 500:
+                    output_size = (500, 500)
+                    img.thumbnail(output_size)
+                    
+                # Save the optimized image
+                img.save(picture_path)
+                
+                # Update user's profile picture
+                # Delete old picture if it exists and isn't the default
+                if current_user.profile_picture and current_user.profile_picture != 'placeholder-profile.jpg':
+                    old_picture_path = os.path.join(app.root_path, 'static/profile_pics', current_user.profile_picture)
+                    if os.path.exists(old_picture_path):
+                        os.remove(old_picture_path)
+                        
+                current_user.profile_picture = picture_filename
+                db.session.commit()
+                flash('Profile picture updated successfully!', 'success')
+            except Exception as e:
+                flash(f'Error processing image: {str(e)}', 'danger')
         else:
             flash('No picture selected.', 'warning')
     else:
