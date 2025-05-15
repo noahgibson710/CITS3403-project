@@ -1,6 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
+<head>  
+  <script>
+    const savedTheme = localStorage.getItem('theme') || 'dark-mode';
+    document.write(`<body class="${savedTheme}">`);
+  </script>
   <meta charset="UTF-8" />
   <title>Health Macro Calculator - Home</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -45,6 +49,15 @@
     {% endblock %}
   </main>
   {% block scripts %}{% endblock %}
+
+  <div class="theme-toggle">
+    <label class="theme-label" for="theme-switch">Toggle Theme</label>
+    <label class="switch">
+        <input type="checkbox" id="theme-switch" onchange="toggleTheme()" />
+        <span class="slider"></span>
+    </label>
+</div>
+
 </body>
 
 </html>
