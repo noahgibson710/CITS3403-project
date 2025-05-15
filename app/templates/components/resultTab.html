@@ -1,26 +1,35 @@
-{# templates/components/resultTab.html #}
-
-{% macro history_item(post) %}
-    <p><strong>Date:</strong> {{ post.timestamp.strftime('%Y-%m-%d %H:%M') }}</p>
-    <p><strong>Gender:</strong> {{ post.gender|capitalize }}</p>
-    <p><strong>Age:</strong> {{ post.age }}</p>
-    <p><strong>Weight:</strong> {{ post.weight }} kg</p>
-    <p><strong>Height:</strong> {{ post.height }} cm</p>
-    <p><strong>BMR:</strong> {{ post.bmr }} cal/day</p>
-    <p><strong>TDEE:</strong> {{ post.tdee }} cal/day</p>
-    <p><strong>Calorie Goal:</strong> {{ post.calorie_goal|capitalize }}</p>
-{% endmacro %}
+{# templates/components/resultTab.html #} {% macro history_item(post) %}
+<p><strong>Date:</strong> {{ post.timestamp.strftime('%Y-%m-%d %H:%M') }}</p>
+<p><strong>Gender:</strong> {{ post.gender|capitalize }}</p>
+<p><strong>Age:</strong> {{ post.age }}</p>
+<p><strong>Weight:</strong> {{ post.weight }} kg</p>
+<p><strong>Height:</strong> {{ post.height }} cm</p>
+<p><strong>BMR:</strong> {{ post.bmr }} cal/day</p>
+<p><strong>TDEE:</strong> {{ post.tdee }} cal/day</p>
+<p><strong>Calorie Goal:</strong> {{ post.calorie_goal|capitalize }}</p>
+{% endmacro %} 
 
 {% macro delete_button(post_id) %}
-<form action="{{ url_for('delete_macro_post', post_id=post_id) }}"
-      method="post"
-      onsubmit="return confirm('Delete this entry?');">
+<form
+  action="{{ url_for('delete_macro_post', post_id=post_id) }}"
+  method="post"
+  onsubmit="return confirm('Delete this entry?');"
+>
   <button type="submit">Delete</button>
 </form>
-{% endmacro %}
+{% endmacro %} 
 
 {% macro community_share_button(post_id) %}
 <form action="{{ url_for('create_feed_post', post_id=post_id) }}" method="post">
-  <button style= "background-color: green" type="submit">Share To Community</button>
+  <button style="background-color: green" type="submit">
+    Share To Community
+  </button>
+</form>
+{% endmacro %} 
+
+{% macro friend_share_button(post_id) %}
+<form action="{{ url_for('feed') }}" method="get">
+  <input type="hidden" name="shared_post_id" value="{{ post_id }}" />
+  <button style="background-color: blue" type="submit">Share To Friends</button>
 </form>
 {% endmacro %}

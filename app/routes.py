@@ -125,8 +125,14 @@ def feed():
         joinedload(FeedPost.macro_post)
     ).order_by(FeedPost.timestamp.desc())
     
+    #get all shared community posts
     posts = posts_query.all()
     
+    # Get the shared post ID from the request, (only if redirected from results page)
+    shared_id = request.args.get("shared_post_id", type=int)
+    if not shared_id:
+        shared_id = None
+
     # Fetch the macro history for each post and attach it
     for post in posts:
         all_history = (MacroPost.query
@@ -140,7 +146,8 @@ def feed():
             macro_history = all_history
         post.macro_history = macro_history
     
-    return render_template("community.html", posts=posts)
+    return render_template("community.html", posts=posts,shared_post_id=shared_id
+)
 
 
 @login_required

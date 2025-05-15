@@ -1,17 +1,19 @@
-{% extends "base.html" %}
-{% import "./components/resultTab.html" as ui %}
-{% block title %}Community Feed{% endblock %}
-
-{% block content %}
+{% extends "base.html" %} {% import "./components/resultTab.html" as ui %} {%
+block title %}Community Feed{% endblock %} {% block content %}
 <div class="container">
   <h1>Community Feed</h1>
-  
+
   <!-- News Sharing Section -->
   <section class="news-section">
     <h2>Peer-to-Peer News Sharing</h2>
-    <p class="subtext">Here is where you will find results other users have shared with you</p>
+    <p class="subtext">
+      Here is where you will find results other users have shared with you
+    </p>
     <div class="friends-note">
-      <strong>Note:</strong> You can only share your results with users you've added as friends. Visit the <a href="{{ url_for('friends') }}">Add Friends</a> page to connect with more users.
+      <strong>Note:</strong> You can only share your results with users you've
+      added as friends. Visit the
+      <a href="{{ url_for('friends') }}">Add Friends</a> page to connect with
+      more users.
     </div>
 
     <!-- Share form -->
@@ -25,7 +27,9 @@
         </div>
 
         <div class="form-group">
-          <label for="post-select">Select one of your macro results to share:</label>
+          <label for="post-select"
+            >Select one of your macro results to share:</label
+          >
           <select id="post-select" class="form-select">
             <option value="">Select a post...</option>
           </select>
@@ -52,374 +56,382 @@
       </div>
     </div>
   </section>
-  
+
   <!-- Community Feed Section -->
   <div class="macro-history">
-      <h2>Recent Community Posts</h2>
-      {% if posts %}
-        {% for post in posts %}
-          <div class="post">
-            <div class="post-header">
-              <h3>{{ post.user.name }}</h3>
-              <span class="post-date">{{ post.timestamp.strftime('%Y-%m-%d %H:%M') }}</span>
-            </div>
-            <div class="visibility-badge 
-                {% if post.visibility == 'public' %}visibility-public{% endif %}
-                {% if post.visibility == 'friends' %}visibility-friends{% endif %}
-                {% if post.visibility == 'private' %}visibility-private{% endif %}">
-                {{ post.visibility }}
-            </div>
-            <p>Macro history count: {{ post.macro_history|length }}</p>
-            <div id="macro-history-graph-{{ post.id }}"></div>
-            <script>
-              const macroData{{ post.id }} = {
-                  dates: {{ post.macro_history | map(attribute='timestamp') | map('string') | list | tojson }},
-                  weights: {{ post.macro_history | map(attribute='weight') | list | tojson }},
-                  bmr: {{ post.macro_history | map(attribute='bmr') | list | tojson }},
-                  tdee: {{ post.macro_history | map(attribute='tdee') | list | tojson }},
-                  calorie_goal: {{ post.macro_history | map(attribute='calorie_goal') | list | tojson }},
-              };
+    <h2>Recent Community Posts</h2>
+    {% if posts %} {% for post in posts %}
+    <div class="post">
+      <div class="post-header">
+        <h3>{{ post.user.name }}</h3>
+        <span class="post-date"
+          >{{ post.timestamp.strftime('%Y-%m-%d %H:%M') }}</span
+        >
+      </div>
+      <div
+        class="visibility-badge {% if post.visibility == 'public' %}visibility-public{% endif %} {% if post.visibility == 'friends' %}visibility-friends{% endif %} {% if post.visibility == 'private' %}visibility-private{% endif %}"
+      >
+        {{ post.visibility }}
+      </div>
+      <p>Macro history count: {{ post.macro_history|length }}</p>
+      <div id="macro-history-graph-{{ post.id }}"></div>
+      <script>
+        const macroData{{ post.id }} = {
+            dates: {{ post.macro_history | map(attribute='timestamp') | map('string') | list | tojson }},
+            weights: {{ post.macro_history | map(attribute='weight') | list | tojson }},
+            bmr: {{ post.macro_history | map(attribute='bmr') | list | tojson }},
+            tdee: {{ post.macro_history | map(attribute='tdee') | list | tojson }},
+            calorie_goal: {{ post.macro_history | map(attribute='calorie_goal') | list | tojson }},
+        };
 
-              Highcharts.chart('macro-history-graph-{{ post.id }}', {
-                  chart: { type: 'line' },
-                  title: { text: 'Macro History for {{ post.user.name }}' },
-                  xAxis: {
-                      categories: macroData{{ post.id }}.dates,
-                      title: { text: 'Date' }
-                  },
-                  yAxis: { title: { text: 'Values' }},
-                  series: [
-                      { name: 'Weight (kg)', data: macroData{{ post.id }}.weights },
-                      { name: 'BMR (cal/day)', data: macroData{{ post.id }}.bmr },
-                      { name: 'TDEE (cal/day)', data: macroData{{ post.id }}.tdee },
-                  ],
-                  accessibility: {
-                      enabled: false
-                  }
-              });
-            </script>
-            
-            <div class="post-content">              
-                <h4>Macro Results:</h4>
-                <p style="color:#ffa07a; margin-bottom: 0.5em;">
-                  <strong>Result Calculated:</strong> {{ post.macro_post.timestamp.strftime('%Y-%m-%d %H:%M') }}
-                </p>
-                <div>
-                  <li>
-                    <div class="info">
-                      {{ ui.history_item(post.macro_post) }}
-                    </div>
-                  </li>
-                </div>
-            </div>
-          </div>
-        {% endfor %}
-      {% else %}
-        <p>No posts available yet. Be the first to create a post!</p>
-      {% endif %}   
+        Highcharts.chart('macro-history-graph-{{ post.id }}', {
+            chart: { type: 'line' },
+            title: { text: 'Macro History for {{ post.user.name }}' },
+            xAxis: {
+                categories: macroData{{ post.id }}.dates,
+                title: { text: 'Date' }
+            },
+            yAxis: { title: { text: 'Values' }},
+            series: [
+                { name: 'Weight (kg)', data: macroData{{ post.id }}.weights },
+                { name: 'BMR (cal/day)', data: macroData{{ post.id }}.bmr },
+                { name: 'TDEE (cal/day)', data: macroData{{ post.id }}.tdee },
+            ],
+            accessibility: {
+                enabled: false
+            }
+        });
+      </script>
+
+      <div class="post-content">
+        <h4>Macro Results:</h4>
+        <p style="color: #ffa07a; margin-bottom: 0.5em">
+          <strong>Result Calculated:</strong> {{
+          post.macro_post.timestamp.strftime('%Y-%m-%d %H:%M') }}
+        </p>
+        <div>
+          <li>
+            <div class="info">{{ ui.history_item(post.macro_post) }}</div>
+          </li>
+        </div>
+      </div>
+    </div>
+    {% endfor %} {% else %}
+    <p>No posts available yet. Be the first to create a post!</p>
+    {% endif %}
   </div>
 </div>
 
 <style>
-.container {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 20px;
-}
+  .container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+  }
 
-.feed {
-  margin-top: 20px;
-}
+  .feed {
+    margin-top: 20px;
+  }
 
-h1, h2 {
-  text-align: center;
-  color: #FF6B6B;
-}
+  h1,
+  h2 {
+    text-align: center;
+    color: #ff6b6b;
+  }
 
-.post-form {
-  background: #657381;
-  padding: 20px;
-  border-radius: 8px;
-  margin-bottom: 30px;
-}
+  .post-form {
+    background: #657381;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 30px;
+  }
 
-.form-group {
-  margin-bottom: 15px;
-}
+  .form-group {
+    margin-bottom: 15px;
+  }
 
-.form-group label {
-  display: block;
-  margin-bottom: 10px;
-  font-weight: bold;
-  color: #FF6B6B;
-}
+  .form-group label {
+    display: block;
+    margin-bottom: 10px;
+    font-weight: bold;
+    color: #ff6b6b;
+  }
 
-.form-select {
-  width: 100%;
-  padding: 10px;
-  border: 1px solid #444;
-  border-radius: 4px;
-  margin-bottom: 15px;
-  background-color: #222;
-  color: #fff;
-  font-size: 15px;
-}
+  .form-select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #444;
+    border-radius: 4px;
+    margin-bottom: 15px;
+    background-color: #222;
+    color: #fff;
+    font-size: 15px;
+  }
 
-.btn-primary, .btn-share {
-  background: #FF6B6B;
-  color: white;
-  border: none;
-  padding: 12px 20px;
-  border-radius: 4px;
-  cursor: pointer;
-  width: 100%;
-  font-size: 16px;
-  font-weight: bold;
-}
+  .btn-primary,
+  .btn-share {
+    background: #ff6b6b;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    width: 100%;
+    font-size: 16px;
+    font-weight: bold;
+  }
 
-.btn-share:hover {
-  background: #FF5252;
-}
+  .btn-share:hover {
+    background: #ff5252;
+  }
 
-.btn-share:disabled {
-  background: #aaa;
-  cursor: not-allowed;
-}
+  .btn-share:disabled {
+    background: #aaa;
+    cursor: not-allowed;
+  }
 
-.post {
-  background: rgb(101, 90, 90); /* dark mode default */
-  border: 1px solid #444;
-  border-radius: 8px;
-  padding: 20px;
-  margin-bottom: 20px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-}
+  .post {
+    background: rgb(101, 90, 90); /* dark mode default */
+    border: 1px solid #444;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  }
 
-/* Light mode override */
-body.light-mode .post {
-  background: #f4f4f4;
-  border: 1px solid #ccc;
-  color: #222;
-}
+  /* Light mode override */
+  body.light-mode .post {
+    background: #f4f4f4;
+    border: 1px solid #ccc;
+    color: #222;
+  }
 
+  .post-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+  }
 
-.post-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 15px;
-}
+  .post-date {
+    color: #ccc;
+    font-size: 0.9em;
+  }
 
-.post-date {
-  color: #ccc;
-  font-size: 0.9em;
-}
+  .macro-results {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 15px;
+    border-radius: 4px;
+    margin-top: 15px;
+  }
 
-.macro-results {
-  background: rgba(255, 255, 255, 0.1);
-  padding: 15px;
-  border-radius: 4px;
-  margin-top: 15px;
-}
+  .macro-results h4 {
+    margin-top: 0;
+    margin-bottom: 10px;
+  }
 
-.macro-results h4 {
-  margin-top: 0;
-  margin-bottom: 10px;
-}
+  .macro-results ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
 
-.macro-results ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
+  .macro-results li {
+    margin-bottom: 5px;
+  }
 
-.macro-results li {
-  margin-bottom: 5px;
-}
+  .visibility-badge {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.8em;
+    font-weight: bold;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+  }
 
-.visibility-badge {
-  display: inline-block;
-  padding: 4px 8px;
-  border-radius: 4px;
-  font-size: 0.8em;
-  font-weight: bold;
-  margin-bottom: 10px;
-  text-transform: uppercase;
-}
+  .visibility-public {
+    background-color: #28a745;
+    color: white;
+  }
 
-.visibility-public {
-  background-color: #28a745;
-  color: white;
-}
+  .visibility-friends {
+    background-color: #fd7e14;
+    color: white;
+  }
 
-.visibility-friends {
-  background-color: #fd7e14;
-  color: white;
-}
+  .visibility-private {
+    background-color: #dc3545;
+    color: white;
+  }
 
-.visibility-private {
-  background-color: #dc3545;
-  color: white;
-}
+  /* News Section Styles */
+  .news-section {
+    margin-bottom: 30px;
+    background: rgb(101, 90, 90);
+    border-radius: 8px;
+    padding: 20px;
+  }
 
-/* News Section Styles */
-.news-section {
-  margin-bottom: 30px;
-  background: rgb(101, 90, 90);
-  border-radius: 8px;
-  padding: 20px;
-}
+  .friends-note {
+    background: rgba(255, 107, 107, 0.1);
+    padding: 15px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+    border-left: 3px solid #ff6b6b;
+  }
 
-.friends-note {
-  background: rgba(255, 107, 107, 0.1);
-  padding: 15px;
-  border-radius: 4px;
-  margin-bottom: 20px;
-  border-left: 3px solid #FF6B6B;
-}
+  .friends-note a {
+    color: #ff6b6b;
+    text-decoration: underline;
+  }
 
-.friends-note a {
-  color: #FF6B6B;
-  text-decoration: underline;
-}
+  .friends-note a:hover {
+    color: #ff5252;
+  }
 
-.friends-note a:hover {
-  color: #FF5252;
-}
+  .sharing-container {
+    background: rgba(0, 0, 0, 0.2);
+    padding: 20px;
+    border-radius: 4px;
+    margin-bottom: 25px;
+  }
 
-.sharing-container {
-  background: rgba(0, 0, 0, 0.2);
-  padding: 20px;
-  border-radius: 4px;
-  margin-bottom: 25px;
-}
+  .share-form {
+    margin-bottom: 0;
+  }
 
-.share-form {
-  margin-bottom: 0;
-}
+  .news-container {
+    margin-top: 15px;
+  }
 
-.news-container {
-  margin-top: 15px;
-}
+  .news-post {
+    margin-bottom: 10px;
+  }
 
-.news-post {
-  margin-bottom: 10px;
-}
+  .shared-post {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 15px;
+    border-radius: 4px;
+    margin-bottom: 15px;
+    border-left: 3px solid #28a745;
+  }
 
-.shared-post {
-  background: rgba(255, 255, 255, 0.1);
-  padding: 15px;
-  border-radius: 4px;
-  margin-bottom: 15px;
-  border-left: 3px solid #28a745;
-}
+  .shared-posts-section {
+    margin-top: 30px;
+  }
 
-.shared-posts-section {
-  margin-top: 30px;
-}
+  .shared-post p {
+    margin: 5px 0;
+  }
+</style>
 
-.shared-post p {
-  margin: 5px 0;
-}
-</style> 
-
-{% endblock %}
-
-{% block scripts %}
+{% endblock %} {% block scripts %}
 <script>
-  document.addEventListener('DOMContentLoaded', function() {
-    const userSelect = document.getElementById('user-select');
-    const postSelect = document.getElementById('post-select');
-    const shareButton = document.getElementById('share-button');
-    const sentPostsContainer = document.getElementById('sent-posts');
-    const receivedPostsContainer = document.getElementById('received-posts');
-    
+  const initialSharedPostId = {{ shared_post_id or "null" }};
+  console.log("Initial shared post ID:", initialSharedPostId);
+
+  document.addEventListener("DOMContentLoaded", function () {
+    const userSelect = document.getElementById("user-select");
+    const postSelect = document.getElementById("post-select");
+    const shareButton = document.getElementById("share-button");
+    const sentPostsContainer = document.getElementById("sent-posts");
+    const receivedPostsContainer = document.getElementById("received-posts");
+
     // Fetch users to populate the dropdown
     function loadUsers() {
-      console.log('Loading friends');
-      fetch('/get_friends')
-        .then(response => response.json())
-        .then(users => {
-          console.log('Friends loaded:', users);
+      console.log("Loading friends");
+      fetch("/get_friends")
+        .then((response) => response.json())
+        .then((users) => {
+          console.log("Friends loaded:", users);
           userSelect.innerHTML = '<option value="">Select a friend...</option>';
-          
+
           if (users.length === 0) {
             // No friends available
-            const noFriendsOption = document.createElement('option');
+            const noFriendsOption = document.createElement("option");
             noFriendsOption.disabled = true;
-            noFriendsOption.textContent = 'No friends available - add friends first';
+            noFriendsOption.textContent =
+              "No friends available - add friends first";
             userSelect.appendChild(noFriendsOption);
-            
+
             // Disable share button if no friends
             shareButton.disabled = true;
           } else {
             // Add each friend to the dropdown
-            users.forEach(user => {
-              const option = document.createElement('option');
+            users.forEach((user) => {
+              const option = document.createElement("option");
               option.value = user.name;
               option.textContent = user.name;
               userSelect.appendChild(option);
             });
-            
+
             // Enable share button
             shareButton.disabled = false;
           }
         })
-        .catch(error => {
-          console.error('Error loading friends:', error);
-          userSelect.innerHTML = '<option value="">Error loading friends</option>';
+        .catch((error) => {
+          console.error("Error loading friends:", error);
+          userSelect.innerHTML =
+            '<option value="">Error loading friends</option>';
         });
     }
-    
+
     // Fetch macro posts to populate the dropdown
     function loadMacroPosts() {
-      console.log('Loading macro posts');
-      fetch('/my_macroposts')
-        .then(response => response.json())
-        .then(posts => {
-          console.log('Macro posts loaded:', posts);
+      console.log("Loading macro posts");
+      fetch("/my_macroposts")
+        .then((response) => response.json())
+        .then((posts) => {
+          console.log("Macro posts loaded:", posts);
           postSelect.innerHTML = '<option value="">Select a post...</option>';
-          
+
           if (posts.length === 0) {
-            const emptyOption = document.createElement('option');
+            const emptyOption = document.createElement("option");
             emptyOption.disabled = true;
-            emptyOption.textContent = 'No macro posts available';
+            emptyOption.textContent = "No macro posts available";
             postSelect.appendChild(emptyOption);
             shareButton.disabled = true;
           } else {
-            posts.forEach(post => {
-              const option = document.createElement('option');
+            posts.forEach((post) => {
+              const option = document.createElement("option");
               option.value = post.id;
               option.textContent = `Age: ${post.age}, Weight: ${post.weight}kg, TDEE: ${post.tdee}, Calorie Goal: ${post.calorie_goal}`;
               postSelect.appendChild(option);
             });
           }
+
+          if (initialSharedPostId) {
+            postSelect.value = initialSharedPostId;
+          }
         })
-        .catch(error => {
-          console.error('Error loading macro posts:', error);
-          postSelect.innerHTML = '<option value="">Error loading posts</option>';
+        .catch((error) => {
+          console.error("Error loading macro posts:", error);
+          postSelect.innerHTML =
+            '<option value="">Error loading posts</option>';
         });
     }
-    
+
     // Load shared posts
     function loadSharedPosts() {
-      console.log('Loading shared posts');
-      
+      console.log("Loading shared posts");
+
       // Set loading state
-      sentPostsContainer.innerHTML = '<p>Loading your shared posts...</p>';
-      receivedPostsContainer.innerHTML = '<p>Loading posts shared with you...</p>';
-      
-      fetch('/shared_posts')
-        .then(response => response.json())
-        .then(data => {
-          console.log('Shared posts loaded:', data);
-          
+      sentPostsContainer.innerHTML = "<p>Loading your shared posts...</p>";
+      receivedPostsContainer.innerHTML =
+        "<p>Loading posts shared with you...</p>";
+
+      fetch("/shared_posts")
+        .then((response) => response.json())
+        .then((data) => {
+          console.log("Shared posts loaded:", data);
+
           // Update sent posts
           if (data.sent && data.sent.length > 0) {
-            sentPostsContainer.innerHTML = '';
-            data.sent.forEach(post => {
-              const postElement = document.createElement('div');
-              postElement.className = 'shared-post';
+            sentPostsContainer.innerHTML = "";
+            data.sent.forEach((post) => {
+              const postElement = document.createElement("div");
+              postElement.className = "shared-post";
               postElement.innerHTML = `
                 <p><strong>Shared with:</strong> ${post.shared_with}</p>
                 <p><strong>Age:</strong> ${post.age}, <strong>Weight:</strong> ${post.weight}kg, <strong>Height:</strong> ${post.height}cm</p>
@@ -430,15 +442,16 @@ body.light-mode .post {
               sentPostsContainer.appendChild(postElement);
             });
           } else {
-            sentPostsContainer.innerHTML = '<p>You haven\'t shared any posts yet.</p>';
+            sentPostsContainer.innerHTML =
+              "<p>You haven't shared any posts yet.</p>";
           }
-          
+
           // Update received posts
           if (data.received && data.received.length > 0) {
-            receivedPostsContainer.innerHTML = '';
-            data.received.forEach(post => {
-              const postElement = document.createElement('div');
-              postElement.className = 'shared-post';
+            receivedPostsContainer.innerHTML = "";
+            data.received.forEach((post) => {
+              const postElement = document.createElement("div");
+              postElement.className = "shared-post";
               postElement.innerHTML = `
                 <p><strong>From:</strong> ${post.shared_with}</p>
                 <p><strong>Age:</strong> ${post.age}, <strong>Weight:</strong> ${post.weight}kg, <strong>Height:</strong> ${post.height}cm</p>
@@ -449,78 +462,84 @@ body.light-mode .post {
               receivedPostsContainer.appendChild(postElement);
             });
           } else {
-            receivedPostsContainer.innerHTML = '<p>No one has shared posts with you yet.</p>';
+            receivedPostsContainer.innerHTML =
+              "<p>No one has shared posts with you yet.</p>";
           }
         })
-        .catch(error => {
-          console.error('Error loading shared posts:', error);
-          sentPostsContainer.innerHTML = '<p>Error loading shared posts. Please try again.</p>';
-          receivedPostsContainer.innerHTML = '<p>Error loading shared posts. Please try again.</p>';
+        .catch((error) => {
+          console.error("Error loading shared posts:", error);
+          sentPostsContainer.innerHTML =
+            "<p>Error loading shared posts. Please try again.</p>";
+          receivedPostsContainer.innerHTML =
+            "<p>Error loading shared posts. Please try again.</p>";
         });
     }
-    
+
     // Share button handler
-    shareButton.addEventListener('click', function() {
+    shareButton.addEventListener("click", function () {
       const selectedUser = userSelect.value;
       const selectedPostId = postSelect.value;
-      
+
       if (!selectedUser) {
-        alert('Please select a friend to share with');
+        alert("Please select a friend to share with");
         return;
       }
-      
+
       if (!selectedPostId) {
-        alert('Please select a post to share');
+        alert("Please select a post to share");
         return;
       }
-      
-      console.log('Sharing post:', { user: selectedUser, postId: selectedPostId });
-      
+
+      console.log("Sharing post:", {
+        user: selectedUser,
+        postId: selectedPostId,
+      });
+
       // Disable button during request
       shareButton.disabled = true;
-      shareButton.textContent = 'Sharing...';
-      
-      fetch('/share_post', {
-        method: 'POST',
+      shareButton.textContent = "Sharing...";
+
+      fetch("/share_post", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json'
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           receiver: selectedUser,
-          post_id: selectedPostId
+          post_id: selectedPostId,
+        }),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          console.log("Share response:", data);
+
+          // Reset button
+          shareButton.disabled = false;
+          shareButton.textContent = "Share";
+
+          if (data.error) {
+            alert(`Error: ${data.error}`);
+          } else {
+            alert(data.message || "Post shared successfully!");
+
+            // Reset selects
+            userSelect.selectedIndex = 0;
+            postSelect.selectedIndex = 0;
+
+            // Refresh the shared posts
+            loadSharedPosts();
+          }
         })
-      })
-      .then(response => response.json())
-      .then(data => {
-        console.log('Share response:', data);
-        
-        // Reset button
-        shareButton.disabled = false;
-        shareButton.textContent = 'Share';
-        
-        if (data.error) {
-          alert(`Error: ${data.error}`);
-        } else {
-          alert(data.message || 'Post shared successfully!');
-          
-          // Reset selects
-          userSelect.selectedIndex = 0;
-          postSelect.selectedIndex = 0;
-          
-          // Refresh the shared posts
-          loadSharedPosts();
-        }
-      })
-      .catch(error => {
-        console.error('Error sharing post:', error);
-        alert('Failed to share post. Please try again.');
-        
-        // Reset button
-        shareButton.disabled = false;
-        shareButton.textContent = 'Share';
-      });
+        .catch((error) => {
+          console.error("Error sharing post:", error);
+          alert("Failed to share post. Please try again.");
+
+          // Reset button
+          shareButton.disabled = false;
+          shareButton.textContent = "Share";
+        });
     });
-    
+
     // Initialize the page
     loadUsers();
     loadMacroPosts();
