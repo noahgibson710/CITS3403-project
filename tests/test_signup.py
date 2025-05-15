@@ -31,14 +31,12 @@ def test_signup_success(client):
     assert b"Login" in response.data or b"Sign in" in response.data or b"Email" in response.data
 
 def test_signup_duplicate_email(client):
-    # First signup
     client.post("/signup", data={
         "name": "user1",
         "email": "duplicate@example.com",
         "password": "GoodPass1@"
     })
 
-    # Attempt duplicate email
     response = client.post("/signup", data={
         "name": "user2",
         "email": "duplicate@example.com",
@@ -48,14 +46,12 @@ def test_signup_duplicate_email(client):
     assert b"This email is already registered" in response.data
 
 def test_signup_duplicate_name(client):
-    # First signup
     client.post("/signup", data={
         "name": "SameName",
         "email": "first@example.com",
         "password": "GoodPass1@"
     })
 
-    # Attempt duplicate name
     response = client.post("/signup", data={
         "name": "SameName",
         "email": "second@example.com",
