@@ -107,10 +107,7 @@
                 <div>
                   <li>
                     <div class="info">
-                      {{ ui.history_item(post) }}
-                    </div>
-                    <div class="actions">
-                      {{ ui.delete_button(post.id) }}
+                      {{ ui.history_item(post.macro_post) }}
                     </div>
                   </li>
                 </div>
@@ -340,7 +337,7 @@ body.light-mode .post {
     // Fetch users to populate the dropdown
     function loadUsers() {
       console.log('Loading friends');
-      fetch('/search_users?q=')
+      fetch('/get_friends')
         .then(response => response.json())
         .then(users => {
           console.log('Friends loaded:', users);

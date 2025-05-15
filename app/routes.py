@@ -331,6 +331,16 @@ def search_users():
 
     return jsonify(results)
 
+@app.route('/get_friends', methods=['GET'])
+def get_friends():
+    friends = current_user.friends.all()
+    return jsonify([
+        {
+            'id': friend.id,
+            'name': friend.name,
+            'profile_picture': url_for('static', filename='profile_pics/' + friend.profile_picture)
+        } for friend in friends
+    ])
 
 @app.route('/friends/list', methods=['GET'])
 @login_required
