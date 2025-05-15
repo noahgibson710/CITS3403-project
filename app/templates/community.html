@@ -105,7 +105,9 @@
                 <p style="color:#ffa07a; margin-bottom: 0.5em;">
                   <strong>Result Calculated:</strong> {{ post.macro_post.timestamp.strftime('%Y-%m-%d %H:%M') }}
                 </p>
-                {{ ui.history_item(post.macro_post) }}
+                <div>
+                    {{ ui.history_item(post) }}
+                </div>
               </div>
             </div>
           </div>
