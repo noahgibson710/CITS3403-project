@@ -112,7 +112,6 @@ button:hover {
 .hero {
   text-align: center;
   padding: 4rem 2rem;
-  background-color: #111; /* Changed from gradient to solid black */
   border-radius: 12px;
   margin: 2rem auto;
   max-width: 900px;
@@ -121,18 +120,37 @@ button:hover {
 
 
 
-.hero h1 {
-  font-size: 2.5rem;
-  color: #ff6b6b;
-  margin-bottom: 1rem;
+/* DARK MODE HERO */
+body.dark-mode .hero {
+  background-color: #111;
+  color: #ddd;
+  box-shadow: 0 0 20px rgba(255, 107, 107, 0.2);
 }
 
-.hero p {
-  font-size: 1.2rem;
-  color: #ddd;
-  max-width: 700px;
-  margin: 0 auto 2rem auto;
+body.dark-mode .hero h1 {
+  color: #ff6b6b;
 }
+
+body.dark-mode .hero p {
+  color: #ddd;
+}
+
+
+/* LIGHT MODE HERO */
+body.light-mode .hero {
+  background-color: #f0f0f0;
+  color: #000;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+}
+
+body.light-mode .hero h1 {
+  color: #ff4b4b;
+}
+
+body.light-mode .hero p {
+  color: #333;
+}
+
 
 /* Call to Action Buttons */
 .cta {
@@ -390,7 +408,6 @@ section p {
   color: #999;
   font-size: 0.9rem;
 }
-
 
 
 .theme-toggle {
@@ -737,15 +754,26 @@ nav ul {
   width: 100%;
 }
 
-.result-item h3,
-.result-item span,
-.result-item strong {
+body.dark-mode .result-item h3,
+body.dark-mode .result-item span,
+body.dark-mode .result-item strong {
   margin: 0;
   flex: 1;
   text-align: left;
   font-size: 1.1rem;
-  color: #fff;
+  color: #fff !important;
 }
+
+body.light-mode .result-item h3,
+body.light-mode .result-item span,
+body.light-mode .result-item strong {
+  margin: 0;
+  flex: 1;
+  text-align: left;
+  font-size: 1.1rem;
+  color: #000 !important;
+}
+
 
 .friend-request-actions {
   display: flex;
@@ -791,13 +819,28 @@ nav ul {
   color: #ff6b6b;
 }
 
-.result-item {
+/* DARK MODE OVERRIDE */
+body.dark-mode .result-item {
   background-color: #252525 !important;
-  padding: 0 !important;
-  margin: 0 !important;
+  color: #fff !important;
+  padding: 15px 20px !important;
+  margin-bottom: 15px !important;
+  border-radius: 8px !important;
   border: none !important;
   box-shadow: none !important;
 }
+
+/* LIGHT MODE OVERRIDE */
+body.light-mode .result-item {
+  background-color: #f9f9f9 !important;
+  color: #000 !important;
+  padding: 15px 20px !important;
+  margin-bottom: 15px !important;
+  border-radius: 8px !important;
+  border: 1px solid #ddd !important;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05) !important;
+}
+
 
 .decline-btn {
   background-color: #555 !important;
@@ -820,3 +863,7 @@ select[disabled] option,
   color: #ffb3b3 !important;
   opacity: 1 !important;
 }
+
+
+
+

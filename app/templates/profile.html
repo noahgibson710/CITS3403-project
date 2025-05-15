@@ -12,27 +12,31 @@
             <h3 style="color:#ff6b6b; margin-bottom: 1em;">You have pending friend request(s):
             </h3>
             {% for request in pending_requests %}
-            <form action="{{ url_for('respond_friend_request', request_id=request.request_id) }}" method="POST"
-                style="display:flex; justify-content:space-between; align-items:center; background:#222; padding:0.8em 1em; border-radius:8px; margin-bottom:10px;">
-                <span style="color:#ffb3b3;"> {{ request.requester.name }}</span>
+            <form action="{{ url_for('respond_friend_request', request_id=request.request_id) }}"
+                method="POST"
+                class="friend-request-form">
+                <span class="requester-name">{{ request.requester.name }}</span>
                 <div>
-                    <button name="decision" value="accept" class="profile-btn update-btn" style="margin-right:0.5em; width:90px;">Accept</button>
-                    <button name="decision" value="decline" class="delete-btn" style="width:90px;">Decline</button>
+                    <button name="decision" value="accept" class="profile-btn update-btn">Accept</button>
+                    <button name="decision" value="decline" class="delete-btn">Decline</button>
                 </div>
             </form>
             {% endfor %}
+
         </div>
         {% endif %}
 
     </header>
-    {% if current_user.id != user.id %}
-       <div style="background: #222; color: #ffb3b3; padding: 1em 1.5em; margin: 1.5em auto; max-width: 600px; border-radius: 12px; text-align: center; box-shadow: 0 0 10px #ff6b6b33;">
-       <p>You are viewing another user's profile.</p>
-       <a href="{{ url_for('profile') }}" style="display: inline-block; margin-top: 0.5em; color: #ff6b6b; font-weight: bold; text-decoration: none;">
-        ← Return to Your Profile
-      </a>
-</div>
-    {% endif %}
+        {% if current_user.id != user.id %}
+            <div class="profile-warning-box">
+                <p>You are viewing another user's profile.</p>
+                <a href="{{ url_for('profile') }}" class="return-link">
+                    ← Return to Your Profile
+                </a>
+            </div>
+        {% endif %}
+ 
+ 
 
     <section class="profile-info">
         <div style="display:flex; flex-direction:column; align-items:center; margin-bottom: 2em;">
