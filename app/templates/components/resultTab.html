@@ -1,0 +1,18 @@
+{# templates/components/resultTab.html #}
+{% macro render_result(post) %}
+<li class="result-item">
+  <div class="info">
+    <p><strong>Date:</strong> {{ post.timestamp.strftime('%Y-%m-%d %H:%M') }}</p>
+    <p><strong>Gender:</strong> {{ post.gender|capitalize }}</p>
+    {# …and so on… #}
+  </div>
+  <div class="actions">
+    <form action="{{ url_for('delete_macro_post', post_id=post.id) }}" method="POST">
+      <button type="submit">Delete</button>
+    </form>
+    <form action="{{ url_for('create_feed_post', post_id=post.id) }}" method="POST">
+      <button type="submit">Share</button>
+    </form>
+  </div>
+</li>
+{% endmacro %}
