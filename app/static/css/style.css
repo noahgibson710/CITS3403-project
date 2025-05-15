@@ -364,7 +364,6 @@ section p {
 }
 
 .macro-history li {
-  margin-bottom: 1.5rem;
   text-align: center;
   border: 1px solid #333;
   border-left: 5px solid #ff6b6b;
@@ -373,6 +372,10 @@ section p {
   margin-bottom: 1rem;
   box-shadow: 0 0 8px rgba(255, 107, 107, 0.1);
   transition: transform 0.2s ease;
+  display: flex;
+  justify-content: space-evenly;
+  align-items: flex-start;
+  gap: 1rem;
 }
 
 .macro-history li:hover {
@@ -384,24 +387,42 @@ section p {
   color: #ffa07a;
 }
 
+.macro-history .info{
+  justify-content: left;
+}
+.macro-history .info p{
+  margin-block: 1rem;
+}
+
+.macro-history li .info{
+    display: inline-table;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 0.25rem 1rem;
+    flex: 0.5;
+}
+
+.macro-history li .actions {
+  display: block;
+  align-self: start;
+  gap: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  gap: 0.25rem 1rem;
+  flex: 0.5;
+}
 
 .macro-history button {
   width: 50%;
-  cursor: pointer;
-}
-
-.macro-history.actions {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 50%;
-  background-color: black;
+  margin-block: 1rem;
 }
 
 .macro-history form {
   background-color: #1a1a1a;
-  border-radius: 10px;
+  padding: 0;
+  margin: 1rem;
 }
+
 
 
 

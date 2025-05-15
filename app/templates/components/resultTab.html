@@ -1,18 +1,35 @@
 {# templates/components/resultTab.html #}
-{% macro render_result(post) %}
-<li class="result-item">
+
+{% macro history_item(post) %}
+<li>
   <div class="info">
     <p><strong>Date:</strong> {{ post.timestamp.strftime('%Y-%m-%d %H:%M') }}</p>
     <p><strong>Gender:</strong> {{ post.gender|capitalize }}</p>
-    {# …and so on… #}
+    <p><strong>Age:</strong> {{ post.age }}</p>
+    <p><strong>Weight:</strong> {{ post.weight }} kg</p>
+    <p><strong>Height:</strong> {{ post.height }} cm</p>
+    <p><strong>BMR:</strong> {{ post.bmr }} cal/day</p>
+    <p><strong>TDEE:</strong> {{ post.tdee }} cal/day</p>
+    <p><strong>Calorie Goal:</strong> {{ post.calorie_goal|capitalize }}</p>
   </div>
   <div class="actions">
-    <form action="{{ url_for('delete_macro_post', post_id=post.id) }}" method="POST">
-      <button type="submit">Delete</button>
-    </form>
-    <form action="{{ url_for('create_feed_post', post_id=post.id) }}" method="POST">
-      <button type="submit">Share</button>
-    </form>
+    {{ delete_button(post.id) }}
+    {{ community_share_button(post.id) }}
   </div>
 </li>
+{% endmacro %}
+
+
+{% macro delete_button(post_id) %}
+<form action="{{ url_for('delete_macro_post', post_id=post_id) }}"
+      method="post"
+      onsubmit="return confirm('Delete this entry?');">
+  <button type="submit">Delete</button>
+</form>
+{% endmacro %}
+
+{% macro community_share_button(post_id) %}
+<form action="{{ url_for('create_feed_post', post_id=post_id) }}" method="post">
+  <button style= "background-color: green" type="submit">Share To Community</button>
+</form>
 {% endmacro %}

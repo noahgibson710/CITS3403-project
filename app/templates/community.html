@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% import "./components/resultTab.html" as ui %}
 {% block title %}Community Feed{% endblock %}
 
 {% block content %}
@@ -104,15 +105,7 @@
                 <p style="color:#ffa07a; margin-bottom: 0.5em;">
                   <strong>Result Calculated:</strong> {{ post.macro_post.timestamp.strftime('%Y-%m-%d %H:%M') }}
                 </p>
-                <ul>
-                  <li>Gender: {{ post.macro_post.gender }}</li>
-                  <li>Age: {{ post.macro_post.age }}</li>
-                  <li>Weight: {{ "%.1f"|format(post.macro_post.weight) }} kg</li>
-                  <li>Height: {{ "%.1f"|format(post.macro_post.height) }} cm</li>
-                  <li>BMR: {{ "%.2f"|format(post.macro_post.bmr) }} calories</li>
-                  <li>TDEE: {{ "%.2f"|format(post.macro_post.tdee) }} calories</li>
-                  <li>Calorie Goal: {{ post.macro_post.calorie_goal|capitalize }}</li>
-                </ul>
+                {{ ui.history_item(post.macro_post) }}
               </div>
             </div>
           </div>
