@@ -864,6 +864,37 @@ select[disabled] option,
   opacity: 1 !important;
 }
 
+.profile-warning-box {
+  background: #222;
+  color: #ffb3b3;
+  padding: 1em 1.5em;
+  margin: 1.5em auto;
+  max-width: 600px;
+  border-radius: 12px;
+  text-align: center;
+  box-shadow: 0 0 10px #ff6b6b33;
+  font-weight: 500;
+}
+
+/* Link style */
+.profile-warning-box .return-link {
+  display: inline-block;
+  margin-top: 0.5em;
+  color: #ff6b6b;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+/* Light mode overrides */
+body.light-mode .profile-warning-box {
+  background: #f9f9f9;
+  color: #a23a3a;  /* darker pinkish red for contrast */
+  box-shadow: 0 0 10px #ff6b6b66;
+}
+
+body.light-mode .profile-warning-box .return-link {
+  color: #d84444;
+}
 
 
 
