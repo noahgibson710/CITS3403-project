@@ -54,7 +54,7 @@
   </section>
   
   <!-- Community Feed Section -->
-  <div class="community-posts macro-history">
+  <div class="macro-history">
       <h2>Recent Community Posts</h2>
       {% if posts %}
         {% for post in posts %}
@@ -100,15 +100,20 @@
             </script>
             
             <div class="post-content">              
-              <div class="macro-history">
                 <h4>Macro Results:</h4>
                 <p style="color:#ffa07a; margin-bottom: 0.5em;">
                   <strong>Result Calculated:</strong> {{ post.macro_post.timestamp.strftime('%Y-%m-%d %H:%M') }}
                 </p>
                 <div>
-                    {{ ui.history_item(post) }}
+                  <li>
+                    <div class="info">
+                      {{ ui.history_item(post) }}
+                    </div>
+                    <div class="actions">
+                      {{ ui.delete_button(post.id) }}
+                    </div>
+                  </li>
                 </div>
-              </div>
             </div>
           </div>
         {% endfor %}

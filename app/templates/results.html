@@ -14,7 +14,15 @@
   <div class="macro-history">
     <ul>
       {% for post in macro_posts %}
-        {{ ui.history_item(post) }}
+      <li>
+        <div class="info">
+          {{ ui.history_item(post) }}
+        </div>
+        <div class="actions">
+          {{ ui.delete_button(post.id) }}
+          {{ ui.community_share_button(post.id) }}
+        </div>
+      </li>
       {% endfor %}
     </ul>
   </div>
