@@ -55,15 +55,14 @@ nav a:hover::after {
   width: 100%;
 }
 
-/* Form styling */
-/* form {
+form {
   background-color: #1a1a1a;
   padding: 2rem;
   border-radius: 10px;
   max-width: 500px;
   margin: 2rem auto;
   box-shadow: 0 0 10px rgba(255, 107, 107, 0.2);
-} */
+}
 
 label {
   font-weight: bold;
