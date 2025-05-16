@@ -9,7 +9,7 @@
 <script src="./static/js/calc.js"></script>
 
 <h1>Calculator Form</h1>
-<form onsubmit="calculate(event)">
+<form onsubmit="calculate(event)" class="calculator">
   <label for="gender">Gender:</label><br>
   <select id="gender" name="gender" required>
     <option value="" disabled {% if not gender %}selected{% endif %}>Select your gender</option>
