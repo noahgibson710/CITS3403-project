@@ -56,10 +56,8 @@ class MacroPost(db.Model):
     user = db.relationship('User', backref=db.backref('macroposts', lazy=True))
 
 
-
 class FeedPost(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    # content = db.Column(db.Text, nullable=False)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     macro_post_id = db.Column(db.Integer, db.ForeignKey('macro_post.id'), nullable=False)
