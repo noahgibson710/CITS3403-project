@@ -23,7 +23,11 @@ The application can be launched by:
 
 First installing the required packages (requirements.txt)
 
-then running flask db upgrade to run the latest database migration
+do this by creating a venv using: python -m venv venv
+
+then activate it using: venv\Scripts\activate for windows(command prompt) or source venv/bin/activate for mac or linux
+
+now use: pip install -r requirements.txt
 
 then run python app.py which runs the flask application
 
