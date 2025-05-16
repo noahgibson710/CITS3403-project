@@ -174,3 +174,7 @@ cython_debug/
 .pypirc
 
 instance/
+instance/users.db
+
+.DS_Store
+**/.DS_Store
