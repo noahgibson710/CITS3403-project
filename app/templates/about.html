@@ -16,9 +16,30 @@
   <h2>How It Works</h2>
   <p>
     By entering your age, weight, height, activity level, and fitness goals,
-    our calculator uses the Mifflin-St Jeor equation to determine your
-    Basal Metabolic Rate (BMR) and Total Daily Energy Expenditure (TDEE).
-    From there, it calculates the optimal macronutrient distribution for
-    your specific needs.
+    our calculator uses the <strong>Mifflin-St Jeor equation</strong> to determine your
+    <strong>Basal Metabolic Rate (BMR)</strong> — the number of calories your body burns at rest.
   </p>
+  <p>
+    <strong>Mifflin-St Jeor Equation:</strong><br>
+    For men: <code>BMR = 10 × weight(kg) + 6.25 × height(cm) − 5 × age + 5</code><br>
+    For women: <code>BMR = 10 × weight(kg) + 6.25 × height(cm) − 5 × age − 161</code>
+  </p>
+  <p>
+    This BMR is then multiplied by your <strong>activity level</strong> to estimate your
+    <strong>Total Daily Energy Expenditure (TDEE)</strong> — the total calories you burn per day.
+  </p>
+  <p>
+    <strong>Activity Multipliers:</strong><br>
+    Sedentary (little or no exercise): BMR × 1.2<br>
+    Lightly active (1–3 days/week): BMR × 1.375<br>
+    Moderately active (3–5 days/week): BMR × 1.55<br>
+    Very active (6–7 days/week): BMR × 1.725<br>
+    Extra active (physical job + exercise): BMR × 1.9
+  </p>
+  <p>
+    Based on your goal (e.g. fat loss, muscle gain, or maintenance), the TDEE is
+    adjusted to create a <strong>calorie deficit</strong>, <strong>surplus</strong>, or <strong>maintenance level</strong>.
+  </p>
+ 
+</section>
 {% endblock %}
