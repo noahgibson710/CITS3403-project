@@ -112,6 +112,9 @@ block title %}Community Feed{% endblock %} {% block content %}
         <div>
           <li>
             <div class="info">{{ ui.history_item(post.macro_post) }}</div>
+            <div class="actions">
+              {{ ui.unshare_post_button(post.macro_post.id) }}
+            </div>
           </li>
         </div>
       </div>

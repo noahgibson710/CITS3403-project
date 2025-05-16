@@ -117,6 +117,7 @@ def delete_macro_post(post_id):
     db.session.commit()
     return redirect(url_for('profile'))
 
+
 @app.route("/feed", methods=["GET"])
 @login_required
 def feed():    
@@ -187,8 +188,23 @@ def create_feed_post(post_id):
     )
     db.session.add(new_post)
     db.session.commit()
-    # Remove flash message to prevent alerts
+
     return redirect(url_for("feed"))
+
+@login_required
+@app.route("/delete_feed_post/<int:post_id>", methods=["POST"])
+def delete_feed_post(post_id):
+    try:
+        post = FeedPost.query.filter_by(macro_post_id=post_id).first()
+        db.session.delete(post)
+        db.session.commit()
+        flash({"success": "Post deleted successfully"})
+    except Exception as e:
+        print(f"Error fetching post: {str(e)}")
+        flash({"error": "Post not found"}), 404
+
+    return redirect(url_for("feed"))
+
 
 @app.route("/about")
 def about():
@@ -417,6 +433,7 @@ def get_my_macroposts():
             'height': post.height,
             'bmr': post.bmr,
             'tdee': post.tdee,
+            'calorie_goal': post.calorie_goal.capitalize(),
             'timestamp': post.timestamp.strftime('%Y-%m-%d %H:%M')
         }
         for post in posts
