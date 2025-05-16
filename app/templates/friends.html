@@ -41,7 +41,7 @@
                             <h3>From {{ request.requester.name }}</h3>
                             <div class="friend-request-actions">
                                 <button onclick="respondToRequest({{ request.request_id }}, 'accept')">Accept</button>
-                                <button class="decline-btn" onclick="respondToRequest({{ request.request_id }}, 'decline')">Decline</button>
+                                <button onclick="respondToRequest({{ request.request_id }}, 'decline')">Decline</button>
                             </div>
                         </div>
                     </li>
