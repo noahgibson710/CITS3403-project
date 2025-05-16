@@ -176,5 +176,5 @@ cython_debug/
 instance/
 instance/users.db
 
-.DS_Store
+.DS_Store/
 **/.DS_Store
