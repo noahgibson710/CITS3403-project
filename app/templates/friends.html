@@ -88,6 +88,29 @@
     70% { opacity: 1; }
     100% { opacity: 0; }
 }
+
+.add-friend-btn {
+    background: linear-gradient(90deg, #ff6b6b 0%, #ff8e53 100%);
+    color: #fff;
+    border: none;
+    padding: 8px 18px;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 2px 8px rgba(255, 107, 107, 0.15);
+    margin-left: 1em;
+    max-width: 140px;
+    width: auto;
+}
+
+.add-friend-btn:hover, .add-friend-btn:focus {
+    background: linear-gradient(90deg, #ff5252 0%, #ffb347 100%);
+    transform: translateY(-2px) scale(1.04);
+    box-shadow: 0 4px 16px rgba(255, 107, 107, 0.25);
+    outline: none;
+}
 </style>
 </div>
 {% endblock %}
@@ -127,7 +150,7 @@ function searchUsers() {
                 item.innerHTML = `
                     <div class="result-item">
                         <span><a href="/profile/u/${encodeURIComponent(user.name)}" class="username-link"><strong>${user.name}</strong></a></span>
-                        <button onclick="addFriend(${user.id}, '${user.name}')">Add Friend</button>
+                        <button class="add-friend-btn" onclick="addFriend(${user.id}, '${user.name}')">Add Friend</button>
                     </div>`;
                 resultsList.appendChild(item);
             });
