@@ -31,6 +31,7 @@ finally control+click the localhost url that appears in the terminal it will ope
 
 4. Instructions for how to run tests
 
+
 ## Test Structure
 
 - `conftest.py`: Test fixtures and configuration
@@ -39,6 +40,8 @@ finally control+click the localhost url that appears in the terminal it will ope
 - `test_forms.py`: Tests for form validation
 - `test_friend_requests.py`: Tests for friend request functionality
 - `test_shared_posts.py`: Tests for shared posts functionality
+- `core_tests.py`: End-to-end tests for user registration, login, macro calculation, profile updates, friend requests, and post sharing
+- `test_selenium_app.py`: Selenium-based browser tests for signup, login, and calculator UI flows
 
 ## Running Tests
 
@@ -48,12 +51,12 @@ To run the full test suite:
 python -m pytest
 ```
 
-To run a specific test file:
+To run a specific test file (e.g., core_tests.py or test_selenium_app.py):
 
 ```bash
-python -m pytest tests/test_models.py
+python -m pytest tests/core_tests.py
+python -m pytest tests/test_selenium_app.py
 ```
-
 To run a specific test function:
 
 ```bash
