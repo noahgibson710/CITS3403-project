@@ -112,9 +112,11 @@ block title %}Community Feed{% endblock %} {% block content %}
         <div>
           <li>
             <div class="info">{{ ui.history_item(post.macro_post) }}</div>
+            {% if post.user_id == current_user.id %}
             <div class="actions">
               {{ ui.unshare_post_button(post.macro_post.id) }}
             </div>
+            {% endif %}
           </li>
         </div>
       </div>
